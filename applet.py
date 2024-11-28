@@ -12,6 +12,9 @@ def load_data():
     return pd.read_csv('data/scriptures_sub.csv')
 
 data = load_data()
+#shift all the values of tsne_x and tsne_y to positive values
+data['tsne_x'] = data['tsne_x'] - data['tsne_x'].min()
+data['tsne_y'] = data['tsne_y'] - data['tsne_y'].min()
 
 # Sidebar
 st.sidebar.title('Settings')
@@ -41,12 +44,13 @@ data_rand = data_50.sample(5000)
 data_plot = pd.concat([data_rand, top50])
 
 
+
 # Set highlight selection
 highlight = alt.selection_multi(fields=['group'])
 
 chart = alt.Chart(data_plot).mark_point().encode(
-    alt.X('tsne_x', scale=alt.Scale(domain=[top50['tsne_x'].min(), top50['tsne_x'].max()]), axis=None),
-    alt.Y('tsne_y', scale=alt.Scale(domain=[top50['tsne_y'].min(), top50['tsne_y'].max()]), axis=None),
+    alt.X('tsne_x', scale=alt.Scale(domain=[top50['tsne_x'].min()*0.8, top50['tsne_x'].max()*1.2]), axis=None),
+    alt.Y('tsne_y', scale=alt.Scale(domain=[top50['tsne_y'].min()*0.8, top50['tsne_y'].max()*1.2]), axis=None),
     color=alt.condition(highlight, 'group', alt.value('lightgray')),  # Highlight selected points
     tooltip=['verse_short_title','cluster']
 ).add_selection(highlight).interactive()
