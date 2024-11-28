@@ -56,10 +56,7 @@ st.altair_chart(points, use_container_width=True)
 selection = alt.selection_single(on='click', fields=['verse_short_title'], nearest=True)
 
 if selection:
-    selected_data = selection.get('verse_short_title')
-    if selected_data:
-        selected_x = selected_data[0]
-        st.write(f"Selected x value: {selected_x}")
+    st.write(f"Selected x value: {type(selection)}")
 
 st.markdown('---')
 for i in range(10):
