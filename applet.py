@@ -44,38 +44,20 @@ data_rand = data_50.sample(5000)
 data_plot = pd.concat([data_rand, top50])
 
 
+# Set highlight selection
+highlight = alt.selection_multi(fields=['group'])
 
-
-
-
-# Create an Altair selection
-selection = alt.selection_single(on='click', fields=['tsne_x'])
-
-# Create the Altair chart
-chart = alt.Chart(data_plot).mark_circle().encode(
-    x='tsne_x',
-    y='tsne_y',
-    color=alt.condition(selection, 'tsne_x:N', alt.value('lightgray')),
-    tooltip=['tsne_x', 'tsne_y']
-).add_selection(
-    selection
-).interactive()
-
-# Display the chart in Streamlit
-st.altair_chart(chart, use_container_width=True)
-
-# Access the selected data point using st.session_state
-if selection in chart.selections:
-    selected_point = st.session_state.get(selection.name)
-    if selected_point:
-        st.write(f"You clicked on x: {selected_point['tsne_x']}, y: {selected_point['tsne_y']}")
-        # Now you can use selected_point['x'] and selected_point['y']
-        # to set other variables or trigger actions in your app
+chart = alt.Chart(data_plot).mark_point().encode(
+    alt.X('tsne_x', scale=alt.Scale(domain=[top50['tsne_x'].min()*0.9, top50['tsne_x'].max()*1.1]), axis=None),
+    alt.Y('tsne_y', scale=alt.Scale(domain=[top50['tsne_y'].min()*0.9, top50['tsne_y'].max()*1.1]), axis=None),
+    color=alt.condition(highlight, 'group', alt.value('lightgray')),  # Highlight selected points
+    tooltip=['verse_short_title','cluster']
+).add_selection(highlight).interactive()
 
 
 st.markdown('---')
 
-#st.altair_chart(chart, use_container_width=True)
+st.altair_chart(chart, use_container_width=True)
 
 st.markdown('---')
 for i in range(10):
