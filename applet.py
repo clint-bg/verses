@@ -7,7 +7,7 @@ st.title('verses')
 st.markdown('Pick a scripture verse and see that other scriptures are similar to it.')
 
 # Load data
-@st.cache
+@st.cache_data
 def load_data():
     return pd.read_csv('data/scriptures_sub.csv')
 
@@ -41,11 +41,9 @@ backgroundpoints = (
 points = (
     alt.Chart(top50)
     .mark_circle()
-    .encode(
-        x=alt.X("tsne_x",scale=alt.Scale(domain=(top50['tsne_x'].min()*0.8, top50['tsne_x'].max()*1.2))), 
-        y=alt.Y("tsne_y",scale=alt.Scale(domain=(top50['tsne_y'].min()*0.8, top50['tsne_y'].max()*1.2))),
-        color="cluster",
-        tooltip=['verse_short_title','cluster'])
+    .encode(x="tsne_x", y="tsne_y", 
+            color="cluster",
+            tooltip=['verse_short_title','cluster'])
 )
 
 chart = alt.vconcat(backgroundpoints + points)
