@@ -24,11 +24,27 @@ f2_df = f1_df[f1_df["chapter_id"] == chapter]
 verse = st.sidebar.selectbox('Verse', f2_df['verse_id'].unique())
 st.write(f'You selected {book} {chapter}:{verse}')
 
+#get data subset based on selected verse
+row = f2_df[(f2_df['verse_id'] == verse)].iloc[0]
+# distance from selected verse based on tsne_x and tsne_y
+data['distance'] = np.sqrt((data['tsne_x'] - row['tsne_x'])**2 + (data['tsne_y'] - row['tsne_y'])**2)
+# get top 10 similar verses
+top50 = data.sort_values('distance').head(50)
 
-c = (
+backgroundpoints = (
    alt.Chart(data)
    .mark_circle()
-   .encode(x="tsne_x", y="tsne_y", text='verse_short_title', color="cluster")
+   .encode(x="tsne_x", y="tsne_y", 
+           color=alt.value("lightgray"))
 )
 
-st.altair_chart(c, use_container_width=True)
+points = (
+    alt.Chart(top50)
+    .mark_circle()
+    .encode(x="tsne_x", y="tsne_y", 
+            color="cluster",
+            tooltip=['verse_short_title','cluster'])
+)
+
+chart = alt.vconcat(backgroundpoints + points)
+st.altair_chart(chart, use_container_width=True)
