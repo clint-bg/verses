@@ -45,12 +45,12 @@ points = (
         alt.X("tsne_x",scale=alt.Scale(domain=[top50['tsne_x'].min(), top50['tsne_x'].max()])),
         alt.Y("tsne_y",scale=alt.Scale(domain=[top50['tsne_y'].min(), top50['tsne_y'].max()])),
         color="cluster",
-        tooltip=['verse_short_title','cluster'])
+        tooltip=['verse_short_title','cluster']).interactive()
 )
 
 chart = alt.vconcat(allpoints + points)
 
-st.altair_chart(points, use_container_width=True).interactive()
+st.altair_chart(points, use_container_width=True)
 
 # Create a selection
 selection = alt.selection_single(on='click', fields=['verse_short_title'], nearest=True)
