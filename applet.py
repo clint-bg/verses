@@ -31,11 +31,11 @@ st.write(f'You selected {book} {chapter}:{verse}')
 row = f2_df[(f2_df['verse_number'] == verse)].iloc[0]
 # distance from selected verse based on tsne_x and tsne_y
 data['distance'] = np.sqrt((data['tsne_x'] - row['tsne_x'])**2 + (data['tsne_y'] - row['tsne_y'])**2)
-# get top 10 similar verses
-top50 = data.sort_values('distance').head(50)
-maxval = top50['distance'].max()
 #set label based on distance
 data['group'] = np.where(data['distance'] < maxval, 'Top50', 'The Rest')
+# get top similar verses
+top50 = data.sort_values('distance').head(50)
+maxval = top50['distance'].max()
 
 data_50 = data[~data['verse_short_title'].isin(top50['verse_short_title'])] 
 
