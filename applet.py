@@ -41,15 +41,14 @@ backgroundpoints = (
 points = (
     alt.Chart(top50)
     .mark_circle()
-    .encode(x="tsne_x", y="tsne_y", 
-            color="cluster",
-            tooltip=['verse_short_title','cluster'])
+    .encode(
+        alt.X("tsne_x",scale=alt.Scale(domain=[top50['tsne_x'].min(), top50['tsne_x'].max()])),
+        alt.Y("tsne_y",scale=alt.Scale(domain=[top50['tsne_y'].min(), top50['tsne_y'].max()])),
+        color="cluster",
+        tooltip=['verse_short_title','cluster'])
 )
 
 chart = alt.vconcat(backgroundpoints + points)
-
-chart.encode.x.scale = alt.Scale(domain=[top50['tsne_x'].min()*0.8, top50['tsne_x'].max()*1.2])
-chart.encode.y.scale = alt.Scale(domain=[top50['tsne_y'].min()*0.8, top50['tsne_y'].max()*1.2])
 
 st.altair_chart(chart, use_container_width=True)
 
