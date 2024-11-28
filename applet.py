@@ -9,7 +9,7 @@ st.markdown('Pick a scripture and see that other scriptures are similar to it.')
 # Load data
 @st.cache
 def load_data():
-    return pd.read_csv('data/verses.csv')
+    return pd.read_csv('data/scriptures_sub.csv')
 
 data = load_data()
 
