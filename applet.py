@@ -32,15 +32,15 @@ data['distance'] = np.sqrt((data['tsne_x'] - row['tsne_x'])**2 + (data['tsne_y']
 top50 = data.sort_values('distance').head(50)
 maxval = top50['distance'].max()
 #set label based on distance
-data['group'] = np.where(data['distance'] < maxval, 'Top50', ' ')
+data['group'] = np.where(data['distance'] < maxval, 'Top50', 'The Rest')
 
 # Set highlight selection
 highlight = alt.selection_multi(fields=['group'])
 
 chart = alt.Chart(data).mark_point().encode(
-    alt.X('tsne_x:Q', scale=alt.Scale(domain=[top50['tsne_x'].min(), top50['tsne_x'].max()]), axis=None),
-    alt.Y('tsne_y:Q', scale=alt.Scale(domain=[top50['tsne_y'].min(), top50['tsne_y'].max()]), axis=None),
-    color=alt.condition(highlight, 'group:N', alt.value('lightgray')),  # Highlight selected points
+    alt.X('tsne_x', scale=alt.Scale(domain=[top50['tsne_x'].min(), top50['tsne_x'].max()]), axis=None),
+    alt.Y('tsne_y', scale=alt.Scale(domain=[top50['tsne_y'].min(), top50['tsne_y'].max()]), axis=None),
+    color=alt.condition(highlight, 'group', alt.value('lightgray')),  # Highlight selected points
     tooltip=['verse_short_title','cluster']
 ).add_selection(highlight).interactive()
 
