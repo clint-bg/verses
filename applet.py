@@ -34,8 +34,10 @@ top50 = data.sort_values('distance').head(50)
 allpoints = (
    alt.Chart(data)
    .mark_circle()
-   .encode(x="tsne_x", y="tsne_y", 
-           color=alt.value("lightgray"))
+   .encode(
+       alt.X("tsne_x", axis=None),
+       alt.Y("tsne_y", axis=None),
+       color=alt.value("lightgray", legend=None)).interactive()
 )
 
 points = (
@@ -50,13 +52,7 @@ points = (
 
 chart = alt.vconcat(allpoints + points)
 
-st.altair_chart(points, use_container_width=True)
-
-# Create a selection
-selection = alt.SelectionParameter(on='click', fields=['verse_short_title'], nearest=True)
-
-if selection:
-    st.write(f"Selected x value: {selection.value}")
+st.altair_chart(chart, use_container_width=True)
 
 st.markdown('---')
 for i in range(10):
