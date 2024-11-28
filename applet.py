@@ -56,4 +56,4 @@ st.write('Top 50 similar verses:')
 st.write(top50[['verse_short_title','scripture_text']])
 
 st.markdown('---')
-st.write(f'Text: {top50["scripture_text"][0]}')
+st.write(f'Text: {top50["scripture_text"].iloc[0]}')
