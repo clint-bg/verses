@@ -31,7 +31,7 @@ data['distance'] = np.sqrt((data['tsne_x'] - row['tsne_x'])**2 + (data['tsne_y']
 # get top 10 similar verses
 top50 = data.sort_values('distance').head(50)
 
-backgroundpoints = (
+allpoints = (
    alt.Chart(data)
    .mark_circle()
    .encode(x="tsne_x", y="tsne_y", 
@@ -48,12 +48,10 @@ points = (
         tooltip=['verse_short_title','cluster'])
 )
 
-#chart = alt.vconcat(backgroundpoints + points)
+chart = alt.vconcat(allpoints + points)
+st.sidebar.altair_chart(chart, use_container_width=True)
 
 st.altair_chart(points, use_container_width=True)
-
-st.write('Top 10 similar verses:')
-st.write(top50[['verse_short_title','scripture_text']].iloc[:10])
 
 st.markdown('---')
 for i in range(10):
