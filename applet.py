@@ -34,10 +34,17 @@ maxval = top50['distance'].max()
 #set label based on distance
 data['group'] = np.where(data['distance'] < maxval, 'Top50', 'The Rest')
 
+data_50 = data[~data['verse_short_title'].isin(top50['verse_short_title'])] 
+
+#get a random subsample of the scriptures that includes the top 50 to speed up rendering
+data_rand = data_50.sample(5000)
+data_plot = pd.concat([data_rand, top50])
+
+
 # Set highlight selection
 highlight = alt.selection_multi(fields=['group'])
 
-chart = alt.Chart(data).mark_point().encode(
+chart = alt.Chart(data_plot).mark_point().encode(
     alt.X('tsne_x', scale=alt.Scale(domain=[top50['tsne_x'].min(), top50['tsne_x'].max()]), axis=None),
     alt.Y('tsne_y', scale=alt.Scale(domain=[top50['tsne_y'].min(), top50['tsne_y'].max()]), axis=None),
     color=alt.condition(highlight, 'group', alt.value('lightgray')),  # Highlight selected points
@@ -45,13 +52,7 @@ chart = alt.Chart(data).mark_point().encode(
 ).add_selection(highlight).interactive()
 
 
-
-
-
-
-
-
-
+st.markdown('---')
 
 st.altair_chart(chart, use_container_width=True)
 
