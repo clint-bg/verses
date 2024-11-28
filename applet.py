@@ -33,6 +33,7 @@ row = f2_df[(f2_df['verse_number'] == verse)].iloc[0]
 data['distance'] = np.sqrt((data['tsne_x'] - row['tsne_x'])**2 + (data['tsne_y'] - row['tsne_y'])**2)
 # get top similar verses
 top50 = data.sort_values('distance').head(50)
+st.write(len(top50))
 maxval = top50['distance'].max()
 #set label based on distance
 data['group'] = np.where(data['distance'] < maxval, 'Top50', 'The Rest')
