@@ -36,7 +36,7 @@ top50 = data.sort_values('distance').head(50)
 maxval = top50['distance'].max()
 #Get subset of data that is not in the top 50
 data_50 = data[~data['verse_short_title'].isin(top50['verse_short_title'])] 
-top50['group'] = 'Top 50'
+top50['group'] = 'Closest 50'
 data_50['group'] = 'The Rest'
 
 #get a random subsample of the scriptures that includes the top 50 to speed up rendering
