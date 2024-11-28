@@ -19,7 +19,7 @@ st.sidebar.markdown('Select a scripture to compare with others.')
 book = st.sidebar.selectbox('Book', data['book_title'].unique())
 # Filter dataframe based on selected country
 f1_df = data[data["book_title"] == book]
-chapter = st.sidebar.selectbox('Chapter', filtered_df['chapter_id'].unique())
+chapter = st.sidebar.selectbox('Chapter', f1_df['chapter_id'].unique())
 f2_df = f1_df[f1_df["chapter_id"] == chapter]
 verse = st.sidebar.selectbox('Verse', f2_df['verse_id'].unique())
 st.write(f'You selected {book} {chapter}:{verse}')
