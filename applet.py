@@ -56,5 +56,5 @@ st.write('Top 10 similar verses:')
 st.write(top50[['verse_short_title','scripture_text']].iloc[:10])
 
 st.markdown('---')
-for row in top50['verse_short_title'].iloc[:10]:
-    st.write(f'Reference: {row['verse_short_title']}: {row['scripture_text']}')
+for i in range(10):
+    st.write(f'{top50['verse_short_title'].iloc[i]}: {top['scripture_text'].iloc[i]}')
