@@ -53,10 +53,10 @@ chart = alt.vconcat(allpoints + points)
 st.altair_chart(points, use_container_width=True)
 
 # Create a selection
-selection = alt.selection_single(on='click', fields=['verse_short_title'], nearest=True)
+selection = alt.SelectionParameter(on='click', fields=['verse_short_title'], nearest=True)
 
 if selection:
-    st.write(f"Selected x value: {type(selection)}")
+    st.write(f"Selected x value: {selection.value}")
 
 st.markdown('---')
 for i in range(10):
