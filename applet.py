@@ -47,7 +47,14 @@ points = (
 )
 
 chart = alt.vconcat(backgroundpoints + points)
+
+chart.encoding.x.scale = alt.Scale(domain=[top50['tsne_x'].min()*0.8, top50['tsne_x'].max()*1.2])
+chart.encoding.y.scale = alt.Scale(domain=[top50['tsne_y'].min()*0.8, top50['tsne_y'].max()*1.2])
+
 st.altair_chart(chart, use_container_width=True)
 
 st.write('Top 50 similar verses:')
-st.write(top50[['verse_short_title','scripture_text']]) 
+st.write(top50[['verse_short_title','scripture_text']])
+
+st.markdown('---')
+st.write(f'Text: {top50["scripture_text"][0]}')
