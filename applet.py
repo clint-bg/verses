@@ -49,7 +49,6 @@ points = (
 )
 
 chart = alt.vconcat(allpoints + points)
-st.sidebar.altair_chart(chart, use_container_width=True)
 
 st.altair_chart(chart | points, use_container_width=True)
 
