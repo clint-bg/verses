@@ -57,4 +57,4 @@ st.write(top50[['verse_short_title','scripture_text']].iloc[:10])
 
 st.markdown('---')
 for i in range(10):
-    st.write(f'{top50['verse_short_title'].iloc[i]}: {top['scripture_text'].iloc[i]}')
+    st.write(f'{top50['verse_short_title'].iloc[i]}: {top50['scripture_text'].iloc[i]}')
