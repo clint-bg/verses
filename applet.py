@@ -34,12 +34,10 @@ data['distance'] = np.sqrt((data['tsne_x'] - row['tsne_x'])**2 + (data['tsne_y']
 # get top similar verses
 top50 = data.sort_values('distance').head(50)
 maxval = top50['distance'].max()
-#set label based on distance
-data['group'] = np.where(data['distance'] < maxval, 'Top50', 'The Rest')
 #Get subset of data that is not in the top 50
 data_50 = data[~data['verse_short_title'].isin(top50['verse_short_title'])] 
-
-st.write(top50.head())
+top50['group'] = 'Top 50'
+data_50['group'] = 'The Rest'
 
 #get a random subsample of the scriptures that includes the top 50 to speed up rendering
 data_rand = data_50.sample(5000)
