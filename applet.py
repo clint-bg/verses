@@ -19,13 +19,13 @@ st.sidebar.markdown('Select a scripture to compare with others.')
 book = st.sidebar.selectbox('Book', data['book_title'].unique())
 # Filter dataframe based on selected country
 f1_df = data[data["book_title"] == book]
-chapter = st.sidebar.selectbox('Chapter', f1_df['chapter_id'].unique())
-f2_df = f1_df[f1_df["chapter_id"] == chapter]
-verse = st.sidebar.selectbox('Verse', f2_df['verse_id'].unique())
+chapter = st.sidebar.selectbox('Chapter', f1_df['chapter_number'].unique())
+f2_df = f1_df[f1_df["chapter_number"] == chapter]
+verse = st.sidebar.selectbox('Verse', f2_df['verse_number'].unique())
 st.write(f'You selected {book} {chapter}:{verse}')
 
 #get data subset based on selected verse
-row = f2_df[(f2_df['verse_id'] == verse)].iloc[0]
+row = f2_df[(f2_df['verse_number'] == verse)].iloc[0]
 # distance from selected verse based on tsne_x and tsne_y
 data['distance'] = np.sqrt((data['tsne_x'] - row['tsne_x'])**2 + (data['tsne_y'] - row['tsne_y'])**2)
 # get top 10 similar verses
@@ -48,3 +48,6 @@ points = (
 
 chart = alt.vconcat(backgroundpoints + points)
 st.altair_chart(chart, use_container_width=True)
+
+st.write('Top 50 similar verses:')
+st.write(top50[['verse_short_title','scripture_text']]) 
