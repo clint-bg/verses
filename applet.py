@@ -36,9 +36,7 @@ allpoints = (
    .mark_circle()
    .encode(
        alt.X("tsne_x", axis=None),
-       alt.Y("tsne_y", axis=None),
-       color=alt.Color('Origin', scale=alt. 
-                      Scale(scheme = 'dark2'))).interactive()
+       alt.Y("tsne_y", axis=None)).interactive()
 )
 
 points = (
