@@ -48,7 +48,7 @@ points = (
         tooltip=['verse_short_title','cluster'])
 )
 
-chart = alt.vconcat(allpoints + points).properties(width=200)
+chart = alt.vconcat(allpoints + points)
 st.sidebar.altair_chart(chart, use_container_width=True)
 
 st.altair_chart(chart | points, use_container_width=True)
