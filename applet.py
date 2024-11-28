@@ -16,7 +16,7 @@ data = load_data()
 # Sidebar
 st.sidebar.title('Settings')
 st.sidebar.markdown('Select a scripture to compare with others.')
-verse = st.sidebar.selectbox('Verse', data['verse'])
+verse = st.sidebar.selectbox('Book', data['book_title'].unique())
 
 
 c = (
