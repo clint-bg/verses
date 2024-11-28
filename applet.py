@@ -52,8 +52,9 @@ points = (
 
 st.altair_chart(points, use_container_width=True)
 
-st.write('Top 50 similar verses:')
-st.write(top50[['verse_short_title','scripture_text']])
+st.write('Top 10 similar verses:')
+st.write(top50[['verse_short_title','scripture_text']].iloc[:10])
 
 st.markdown('---')
-st.write(f'Text: {top50["scripture_text"].iloc[0]}')
+for row in top50['verse_short_title'].iloc[:10]:
+    st.write(f'Reference: {row['verse_short_title']}: {row['scripture_text']}')
