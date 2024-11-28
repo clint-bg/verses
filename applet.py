@@ -38,11 +38,8 @@ data['group'] = np.where(data['distance'] < maxval, 'A', 'B')
 highlight = alt.selection_multi(fields=['group'])
 
 chart = alt.Chart(data).mark_point().encode(
-
-    x='tsne_x:Q',
-
-    y='tsne_y:Q',
-
+    alt.X('tsne_x:Q', scale=alt.Scale(domain=[top50['tsne_x'].min(), top50['tsne_x'].max()]), axis=None),
+    alt.Y('tsne_y:Q', scale=alt.Scale(domain=[top50['tsne_x'].min(), top50['tsne_x'].max()]), axis=None),
     color=alt.condition(highlight, 'group:N', alt.value('lightgray'))  # Highlight selected points
 
 ).add_selection(highlight).interactive()
