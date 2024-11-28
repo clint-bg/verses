@@ -37,7 +37,8 @@ allpoints = (
    .encode(
        alt.X("tsne_x", axis=None),
        alt.Y("tsne_y", axis=None),
-       color=alt.Color("Origin", legend=None)).interactive()
+       color=alt.Color('Origin', scale=alt. 
+                      Scale(scheme = 'dark2'))).interactive()
 )
 
 points = (
