@@ -48,9 +48,9 @@ points = (
         tooltip=['verse_short_title','cluster'])
 )
 
-chart = alt.vconcat(backgroundpoints + points)
+#chart = alt.vconcat(backgroundpoints + points)
 
-st.altair_chart(chart, use_container_width=True)
+st.altair_chart(points, use_container_width=True)
 
 st.write('Top 50 similar verses:')
 st.write(top50[['verse_short_title','scripture_text']])
