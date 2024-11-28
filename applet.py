@@ -19,13 +19,16 @@ data['tsne_y'] = data['tsne_y'] - data['tsne_y'].min()
 # Sidebar
 st.sidebar.title('Settings')
 st.sidebar.markdown('Select a scripture to compare with others.')
-book = st.sidebar.selectbox('Book', data['book_title'].unique())
+book = st.sidebar.selectbox('Book', data['book_title'].unique(), key='book')
 # Filter dataframe based on selected country
 f1_df = data[data["book_title"] == book]
-chapter = st.sidebar.selectbox('Chapter', f1_df['chapter_number'].unique())
+chapter = st.sidebar.selectbox('Chapter', f1_df['chapter_number'].unique(),key='chapter')
 f2_df = f1_df[f1_df["chapter_number"] == chapter]
-verse = st.sidebar.selectbox('Verse', f2_df['verse_number'].unique())
+verse = st.sidebar.selectbox('Verse', f2_df['verse_number'].unique(),key='verse')
 st.write(f'You selected {book} {chapter}:{verse}')
+
+# Store the selected value in session state
+st.session_state["selected_option"] = [book, chapter, verse]
 
 #get data subset based on selected verse
 row = f2_df[(f2_df['verse_number'] == verse)].iloc[0]
@@ -58,7 +61,14 @@ chart = alt.Chart(data_plot).mark_point().encode(
 st.markdown('---')
 
 st.altair_chart(chart, use_container_width=True)
+if st.button('Move Up'):
+    #get the highest y value of the top 50
+    book(book) = 'Nephi'
+    #set selected verse to the verse with the highest y value
 
 st.markdown('---')
 for i in range(10):
+    # add a streamlit button that if the user clicks it, the verse will be displayed
+    if st.button(f'Show verse {i+1}'):
+
     st.write(f'{top50['verse_short_title'].iloc[i]}: {top50['scripture_text'].iloc[i]}')
