@@ -36,6 +36,8 @@ def set(row):
     st.session_state.chapter = row['chapter_number']
     st.session_state.verse = row['verse_number']
 
+st.write(st.session_state)
+
 book = st.sidebar.selectbox('Book', data['book_title'].unique(), key='book')
 # Filter dataframe based on selected country
 f1_df = data[data["book_title"] == book]
