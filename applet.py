@@ -82,4 +82,4 @@ st.button('Move Up', key='move_up', on_click=moveUp)
 
 for i in range(10):
     st.button(top50['verse_short_title'].iloc[i],on_click=setref(i))
-    st.write(f'{}: {top50['scripture_text'].iloc[i]}')
+    st.write(f'{top50['scripture_text'].iloc[i]}')
