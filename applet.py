@@ -143,9 +143,16 @@ textval = top50['verse_short_title'].iloc[8]
 st.button(textval, on_click=lambda: setref(8))
 st.write(f'{top50['scripture_text'].iloc[8]}')
 
+st.markdown('---')
+
 otherscrip = 'Other Similar Scriptures: '
 for i in range(9, 50):
     otherscrip += ', ' + top50['verse_short_title'].iloc[i]
 st.write(otherscrip)
 
-#st.write(st.session_state)
+st.markdown('---')
+st.markdown('# About')
+st.markdown('This app was developed using Google\'s generativeai package. First each scripture \\
+            of over 41,000 verses was processed with text-embedding-004 and then embedded into a \\
+                2D space using t-SNE. The above map is where each scripture is given a 2D coordinate. \\
+                    Further details can be found on [kaggle](https://www.kaggle.com/code/molecman/classification-of-book-of-mormon-authors).')
