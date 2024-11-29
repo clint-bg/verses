@@ -107,42 +107,40 @@ col4.button('Move Left', key='move_left', on_click=moveLeft)
 
 st.markdown('---')
 
-top8 = top50.iloc[1:9].sort_index()
-
 textval = top50['verse_short_title'].iloc[0]
 st.button(textval)
 st.write(f'{top50['scripture_text'].iloc[0]}')
 
-textval = top8['verse_short_title'].iloc[0]
-st.button(textval, on_click=lambda: setref(0))
-st.write(f'{top8['scripture_text'].iloc[0]}')
-
-textval = top8['verse_short_title'].iloc[1]
+textval = top50['verse_short_title'].iloc[1]
 st.button(textval, on_click=lambda: setref(1))
-st.write(f'{top8['scripture_text'].iloc[1]}')
+st.write(f'{top50['scripture_text'].iloc[1]}')
 
-textval = top8['verse_short_title'].iloc[2]
+textval = top50['verse_short_title'].iloc[2]
 st.button(textval, on_click=lambda: setref(2))
-st.write(f'{top8['scripture_text'].iloc[2]}')
+st.write(f'{top50['scripture_text'].iloc[2]}')
 
-textval = top8['verse_short_title'].iloc[3]
+textval = top50['verse_short_title'].iloc[3]
 st.button(textval, on_click=lambda: setref(3))
-st.write(f'{top8['scripture_text'].iloc[3]}')
+st.write(f'{top50['scripture_text'].iloc[3]}')
 
-textval = top8['verse_short_title'].iloc[4]
+textval = top50['verse_short_title'].iloc[4]
 st.button(textval, on_click=lambda: setref(4))
-st.write(f'{top8['scripture_text'].iloc[4]}')
+st.write(f'{top50['scripture_text'].iloc[4]}')
 
-textval = top8['verse_short_title'].iloc[5]
+textval = top50['verse_short_title'].iloc[5]
 st.button(textval, on_click=lambda: setref(5))
-st.write(f'{top8['scripture_text'].iloc[5]}')
+st.write(f'{top50['scripture_text'].iloc[5]}')
 
-textval = top8['verse_short_title'].iloc[6]
+textval = top50['verse_short_title'].iloc[6]
 st.button(textval, on_click=lambda: setref(6))
-st.write(f'{top8['scripture_text'].iloc[6]}')
+st.write(f'{top50['scripture_text'].iloc[6]}')
 
-textval = top8['verse_short_title'].iloc[7]
+textval = top50['verse_short_title'].iloc[7]
 st.button(textval, on_click=lambda: setref(7))
-st.write(f'{top8['scripture_text'].iloc[7]}')
+st.write(f'{top50['scripture_text'].iloc[7]}')
+
+textval = top50['verse_short_title'].iloc[8]
+st.button(textval, on_click=lambda: setref(8))
+st.write(f'{top50['scripture_text'].iloc[8]}')
 
 #st.write(st.session_state)
