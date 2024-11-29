@@ -62,7 +62,8 @@ f2_df = f1_df[f1_df["chapter_number"] == chapter]
 try:
     verse = st.sidebar.selectbox('Verse', f2_df['verse_number'].unique(),key='verse', index=15)
 except:
-    st.session_state.verse = f2_df['verse_number'].iloc[0]
+    verse = f2_df['verse_number'].iloc[0]
+    st.session_state.verse = verse
 st.write(f'You selected {book} {chapter}:{verse}')
 
 #get data subset based on selected verse
