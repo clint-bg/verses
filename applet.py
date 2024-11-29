@@ -31,14 +31,9 @@ def setref(i):
     return set(row)
 
 def set(row):
-    try:
-        st.session_state.book = row['book_title'].iloc[0]
-        st.session_state.chapter = row['chapter_number'].iloc[0]
-        st.session_state.verse = row['verse_number'].iloc[0]
-    except:
-        st.session_state.book = row['book_title']
-        st.session_state.chapter = row['chapter_number']
-        st.session_state.verse = row['verse_number']
+    st.session_state.book = row['book_title'].iloc[0]
+    st.session_state.chapter = row['chapter_number'].iloc[0]
+    st.session_state.verse = row['verse_number'].iloc[0]
 
 book = st.sidebar.selectbox('Book', data['book_title'].unique(), key='book')
 # Filter dataframe based on selected country
