@@ -70,7 +70,7 @@ data['distance'] = np.sqrt((data['tsne_x'] - row['tsne_x'])**2 + (data['tsne_y']
 top50 = data.sort_values('distance').head(50)
 maxval = top50['distance'].max()
 #Get subset of data that is not in the top 50
-data_50 = data[~data['verse_short_title'].isin(top50['verse_short_title'])] 
+data_50 = data[~data['verse_short_title'].isin(top50['verse_short_title'])]
 top50['group'] = 'Closest 50'
 data_50['group'] = 'The Rest'
 
@@ -106,6 +106,9 @@ col3.button('Move Right', key='move_right', on_click=moveRight)
 col4.button('Move Left', key='move_left', on_click=moveLeft)
 
 st.markdown('---')
+
+top9 = top50.head(9).sort_values('scripture_text')
+st.write(top9)
 
 textval = top50['verse_short_title'].iloc[0]
 st.button(textval)
@@ -143,4 +146,4 @@ textval = top50['verse_short_title'].iloc[8]
 st.button(textval, on_click=lambda: setref(8))
 st.write(f'{top50['scripture_text'].iloc[8]}')
 
-st.write(st.session_state)
+#st.write(st.session_state)
