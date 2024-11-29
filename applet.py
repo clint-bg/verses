@@ -107,7 +107,7 @@ col4.button('Move Left', key='move_left', on_click=moveLeft)
 
 st.markdown('---')
 
-top9 = top50.head(9).sort_values('verse_short_title')
+top9 = top50.head(9).sort_index()
 st.write(top9)
 
 textval = top50['verse_short_title'].iloc[0]
