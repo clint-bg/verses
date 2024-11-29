@@ -29,7 +29,7 @@ verse = st.sidebar.selectbox('Verse', f2_df['verse_number'].unique(),key='verse'
 st.write(f'You selected {book} {chapter}:{verse}')
 
 def update_ref_up():
-    st.session_state.book = 'Nephi'
+    st.session_state.book = '1 Nephi'
     return st.session_state.verse
 
 # Store the selected value in session state
