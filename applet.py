@@ -54,7 +54,7 @@ def set(row):
         st.session_state.chapter = row['chapter_number']
         st.session_state.verse = row['verse_number']
 
-book = st.sidebar.selectbox('Book', data['book_title'].unique(), key='book')
+book = st.sidebar.selectbox('Book', data['book_title'].unique(), key='book', index=10)
 # Filter dataframe based on selected country
 f1_df = data[data["book_title"] == book]
 chapter = st.sidebar.selectbox('Chapter', f1_df['chapter_number'].unique(),key='chapter')
