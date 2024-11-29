@@ -143,4 +143,9 @@ textval = top50['verse_short_title'].iloc[8]
 st.button(textval, on_click=lambda: setref(8))
 st.write(f'{top50['scripture_text'].iloc[8]}')
 
+otherscrip = 'Other Similar Scriptures: '
+for i in range(9, 50):
+    otherscrip += ', ' + top50['verse_short_title'].iloc[i]
+st.write(otherscrip)
+
 #st.write(st.session_state)
