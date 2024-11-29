@@ -32,11 +32,9 @@ def setref(i):
     return set(row)
 
 def set(row):
-    st.session_state.book = row['book_title']
-    st.session_state.chapter = row['chapter_number']
-    st.session_state.verse = row['verse_number']
-
-st.write(st.session_state)
+    st.session_state.book = row['book_title'].iloc[0]
+    st.session_state.chapter = row['chapter_number'].iloc[0]
+    st.session_state.verse = row['verse_number'].iloc[0]
 
 book = st.sidebar.selectbox('Book', data['book_title'].unique(), key='book')
 # Filter dataframe based on selected country
@@ -61,7 +59,7 @@ data_50['group'] = 'The Rest'
 st.session_state['top50'] = top50
 
 #get a random subsample of the scriptures that includes the top 50 to speed up rendering
-data_rand = data_50.sample(5000)
+data_rand = data_50.sample(5000, random_state=1)
 data_plot = pd.concat([data_rand, top50])
 
 
@@ -84,6 +82,7 @@ st.markdown('---')
 
 st.button('Move Up', key='move_up', on_click=moveUp)
 
-textval = top50['verse_short_title'].iloc[0]
-st.button(textval)
-st.write(f'{top50['scripture_text'].iloc[0]}')
+#for i in range(10):
+#    textval = top50['verse_short_title'].iloc[i]
+#    st.button(textval,on_click=setref(i))
+#    st.write(f'{top50['scripture_text'].iloc[i]}')
