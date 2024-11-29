@@ -63,7 +63,7 @@ st.markdown('---')
 st.altair_chart(chart, use_container_width=True)
 if st.button('Move Up'):
     #get the highest y value of the top 50
-    book = 'Nephi'
+    st.session_state.book = 'Nephi'
     #set selected verse to the verse with the highest y value
 
 st.markdown('---')
