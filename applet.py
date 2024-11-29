@@ -58,7 +58,7 @@ book = st.sidebar.selectbox('Book', data['book_title'].unique(), key='book', ind
 # Filter dataframe based on selected country
 f1_df = data[data["book_title"] == book]
 if len(f1_df['chapter_number'].unique()) >= 2:
-    cnum = 1
+    cnum = 2
 else:
     cnum = 0
 chapter = st.sidebar.selectbox('Chapter', f1_df['chapter_number'].unique(),key='chapter', index=cnum)
