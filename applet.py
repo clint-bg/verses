@@ -28,7 +28,6 @@ def moveUp():
 
 def setref(i):
     row = st.session_state.top50.iloc[i]
-    st.write(i, row['book_title'], row['chapter_number'], row['verse_number'])
     return set(row)
 
 def set(row):
@@ -87,10 +86,17 @@ st.markdown('---')
 
 st.button('Move Up', key='move_up', on_click=moveUp)
 
-for i in range(10):
-    textval = top50['verse_short_title'].iloc[i]
-    st.write(i)
-    st.button(textval, on_click=lambda: setref(i))
-    st.write(f'{top50['scripture_text'].iloc[i]}')
+st.markdown('---')
+
+textval = top50['verse_short_title'].iloc[0]
+st.write(f'{textval}: {top50['scripture_text'].iloc[0]}')
+
+textval = top50['verse_short_title'].iloc[1]
+st.button(textval, on_click=lambda: setref(1))
+st.write(f'{top50['scripture_text'].iloc[1]}')
+
+textval = top50['verse_short_title'].iloc[2]
+st.button(textval, on_click=lambda: setref(2))
+st.write(f'{top50['scripture_text'].iloc[2]}')
 
 st.write(st.session_state)
