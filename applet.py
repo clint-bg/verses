@@ -57,8 +57,11 @@ def set(row):
 book = st.sidebar.selectbox('Book', data['book_title'].unique(), key='book', index=42)
 # Filter dataframe based on selected country
 f1_df = data[data["book_title"] == book]
-st.write(f1_df['chapter_number'].unique())
-chapter = st.sidebar.selectbox('Chapter', f1_df['chapter_number'].unique(),key='chapter', index=2)
+if len(f1_df['chapter_number'].unique()) >= 2:
+    cnum = 1
+else:
+    cnum = 0
+chapter = st.sidebar.selectbox('Chapter', f1_df['chapter_number'].unique(),key='chapter', index=cnum)
 f2_df = f1_df[f1_df["chapter_number"] == chapter]
 if len(f2_df['verse_number'].unique()) >= 16:
     vnum = 15
