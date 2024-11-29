@@ -20,8 +20,14 @@ data['tsne_y'] = data['tsne_y'] - data['tsne_y'].min()
 st.sidebar.title('Settings')
 st.sidebar.markdown('Select a scripture to compare with others.')
 
-def move_up():
-    st.session_state.book = '1 Nephi'
+def moveUp():
+    top = st.session_state.top50
+    val = top['tsne_y'].max()
+    #pick the row in the top dataframe where tsne_y equals val
+    row = top[top['tsne_y'] == val]]
+    st.session_state.book = row['book_title'].iloc[0]
+    st.session_state.chapter = row['chapter_number'].iloc[0]
+    st.session_state.verse = row['verse_number'].iloc[0]
 
 book = st.sidebar.selectbox('Book', data['book_title'].unique(), key='book')
 # Filter dataframe based on selected country
@@ -30,9 +36,6 @@ chapter = st.sidebar.selectbox('Chapter', f1_df['chapter_number'].unique(),key='
 f2_df = f1_df[f1_df["chapter_number"] == chapter]
 verse = st.sidebar.selectbox('Verse', f2_df['verse_number'].unique(),key='verse')
 st.write(f'You selected {book} {chapter}:{verse}')
-
-# Store the selected value in session state
-st.session_state["selected_option"] = [book, chapter, verse]
 
 #get data subset based on selected verse
 row = f2_df[(f2_df['verse_number'] == verse)].iloc[0]
@@ -46,6 +49,8 @@ data_50 = data[~data['verse_short_title'].isin(top50['verse_short_title'])]
 top50['group'] = 'Closest 50'
 data_50['group'] = 'The Rest'
 
+st.session_state['top50'] = top50
+
 #get a random subsample of the scriptures that includes the top 50 to speed up rendering
 data_rand = data_50.sample(5000)
 data_plot = pd.concat([data_rand, top50])
@@ -55,8 +60,8 @@ data_plot = pd.concat([data_rand, top50])
 highlight = alt.selection_multi(fields=['group'])
 
 chart = alt.Chart(data_plot).mark_point().encode(
-    alt.X('tsne_x', scale=alt.Scale(domain=[top50['tsne_x'].min()*0.9, top50['tsne_x'].max()*1.1]), axis=None),
-    alt.Y('tsne_y', scale=alt.Scale(domain=[top50['tsne_y'].min()*0.9, top50['tsne_y'].max()*1.1]), axis=None),
+    alt.X('tsne_x', scale=alt.Scale(domain=[top50['tsne_x'].min()*0.8, top50['tsne_x'].max()*1.2]), axis=None),
+    alt.Y('tsne_y', scale=alt.Scale(domain=[top50['tsne_y'].min()*0.8, top50['tsne_y'].max()*1.2]), axis=None),
     color=alt.condition(highlight, 'group', alt.value('lightgray')),  # Highlight selected points
     tooltip=['verse_short_title','cluster']
 ).add_selection(highlight).interactive()
@@ -68,7 +73,7 @@ st.altair_chart(chart, use_container_width=True)
 
 st.markdown('---')
 
-st.button('Move Up', key='move_up', on_click=move_up)
+st.button('Move Up', key='move_up', on_click=moveUp)
 
 st.write(st.session_state)
 
