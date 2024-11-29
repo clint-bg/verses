@@ -54,12 +54,12 @@ def set(row):
         st.session_state.chapter = row['chapter_number']
         st.session_state.verse = row['verse_number']
 
-book = st.sidebar.selectbox('Book', data['book_title'].unique(), key='book', index=10)
+book = st.sidebar.selectbox('Book', data['book_title'].unique(), key='book', index=42)
 # Filter dataframe based on selected country
 f1_df = data[data["book_title"] == book]
-chapter = st.sidebar.selectbox('Chapter', f1_df['chapter_number'].unique(),key='chapter')
+chapter = st.sidebar.selectbox('Chapter', f1_df['chapter_number'].unique(),key='chapter', index=2)
 f2_df = f1_df[f1_df["chapter_number"] == chapter]
-verse = st.sidebar.selectbox('Verse', f2_df['verse_number'].unique(),key='verse')
+verse = st.sidebar.selectbox('Verse', f2_df['verse_number'].unique(),key='verse', index=16)
 st.write(f'You selected {book} {chapter}:{verse}')
 
 #get data subset based on selected verse
