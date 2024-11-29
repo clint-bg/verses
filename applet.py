@@ -17,7 +17,7 @@ data['tsne_x'] = data['tsne_x'] - data['tsne_x'].min()
 data['tsne_y'] = data['tsne_y'] - data['tsne_y'].min()
 
 # Sidebar
-st.sidebar.title('Settings')
+st.sidebar.title('verse')
 st.sidebar.markdown('Select a scripture to compare with others.')
 
 def moveUp():
@@ -152,7 +152,8 @@ st.write(otherscrip)
 
 st.markdown('---')
 st.markdown('# About')
-st.markdown('This app was developed using Google\'s generativeai package. First each scripture \\
+st.markdown('This app was developed using Google generativeai package. First each scripture \\
             of over 41,000 verses was processed with text-embedding-004 and then embedded into a \\
                 2D space using t-SNE. The above map is where each scripture is given a 2D coordinate. \\
-                    Further details can be found on [kaggle](https://www.kaggle.com/code/molecman/classification-of-book-of-mormon-authors).')
+                    Further details can be found on \\
+                        [kaggle](https://www.kaggle.com/code/molecman/classification-of-book-of-mormon-authors).')
