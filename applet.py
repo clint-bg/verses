@@ -24,7 +24,12 @@ def moveUp():
     top = st.session_state.top50
     val = top['tsne_y'].max()
     #pick the row in the top dataframe where tsne_y equals val
-    row = top[top['tsne_y'] == val]
+    return top[top['tsne_y'] == val]
+
+def setref(i):
+    return set(top50.iloc[i])
+
+def set(row):
     st.session_state.book = row['book_title'].iloc[0]
     st.session_state.chapter = row['chapter_number'].iloc[0]
     st.session_state.verse = row['verse_number'].iloc[0]
@@ -75,7 +80,6 @@ st.markdown('---')
 
 st.button('Move Up', key='move_up', on_click=moveUp)
 
-st.write(st.session_state)
-
 for i in range(10):
-    st.write(f'{top50['verse_short_title'].iloc[i]}: {top50['scripture_text'].iloc[i]}')
+    st.button(top50['verse_short_title'].iloc[i],on_click=setref(i))
+    st.write(f'{}: {top50['scripture_text'].iloc[i]}')
