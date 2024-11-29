@@ -160,4 +160,4 @@ st.write(otherscrip)
 
 st.markdown('---')
 st.markdown('## about')
-st.write('This app was developed using Google generativeai package. First each scripture of over 41,000 verses was processed with text-embedding-004 and then embedded into a 2D space using t-SNE. The above map is where each scripture is given a 2D coordinate. Further details can be found on [kaggle](https://www.kaggle.com/code/molecman/classification-of-book-of-mormon-authors).')
+st.write('This app was developed using Google generativeai package. First each scripture of over 41,000 verses was processed with text-embedding-004 and then embedded into a 2D space using t-SNE. The above map is where each scripture is given a 2D coordinate. Further details can be found [here on kaggle](https://www.kaggle.com/code/molecman/2d-map-of-the-scriptures). The methods to obtain the map are explained.')
