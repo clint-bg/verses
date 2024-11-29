@@ -63,12 +63,9 @@ st.markdown('---')
 st.altair_chart(chart, use_container_width=True)
 if st.button('Move Up'):
     #get the highest y value of the top 50
-    book(book) = 'Nephi'
+    book = 'Nephi'
     #set selected verse to the verse with the highest y value
 
 st.markdown('---')
-for i in range(10):
-    # add a streamlit button that if the user clicks it, the verse will be displayed
-    if st.button(f'Show verse {i+1}'):
 
-    st.write(f'{top50['verse_short_title'].iloc[i]}: {top50['scripture_text'].iloc[i]}')
+st.write(st.session_state)
