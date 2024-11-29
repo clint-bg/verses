@@ -28,6 +28,7 @@ def moveUp():
 
 def setref(i):
     row = st.session_state.top50.iloc[i]
+    st.write(i, row['book_title'])
     return set(row)
 
 def set(row):
