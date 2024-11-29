@@ -24,7 +24,7 @@ def moveUp():
     top = st.session_state.top50
     val = top['tsne_y'].max()
     #pick the row in the top dataframe where tsne_y equals val
-    return top[top['tsne_y'] == val]
+    set(top[top['tsne_y'] == val])
 
 def setref(i):
     return set(top50.iloc[i])
