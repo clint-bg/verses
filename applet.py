@@ -27,7 +27,8 @@ def moveUp():
     set(top[top['tsne_y'] == val])
 
 def setref(i):
-    return set(top50.iloc[i])
+    row = st.session_state.top50.iloc[i]
+    return set(row)
 
 def set(row):
     st.session_state.book = row['book_title'].iloc[0]
@@ -82,5 +83,6 @@ st.button('Move Up', key='move_up', on_click=moveUp)
 
 for i in range(10):
     textval = top50['verse_short_title'].iloc[i]
+    st.write(textval)
     st.button(textval,on_click=setref(i))
     st.write(f'{top50['scripture_text'].iloc[i]}')
