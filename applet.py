@@ -107,12 +107,12 @@ col4.button('Move Left', key='move_left', on_click=moveLeft)
 
 st.markdown('---')
 
-top9 = top50.head(9).sort_index()
-st.write(top9)
+top8 = top50.iloc[1:9].sort_index()
+st.write(top8)
 
 textval = top50['verse_short_title'].iloc[0]
 st.button(textval)
-st.write(f'{textval}: {top50['scripture_text'].iloc[0]}')
+st.write(f'{top50['scripture_text'].iloc[0]}')
 
 textval = top50['verse_short_title'].iloc[1]
 st.button(textval, on_click=lambda: setref(1))
