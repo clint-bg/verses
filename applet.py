@@ -4,7 +4,7 @@ import numpy as np
 import altair as alt
 
 st.title('verses')
-st.markdown('Pick a scripture verse and see that other scriptures are similar to it.')
+st.markdown('Pick a scripture verse and see that other scriptures are similar to it. You can pick a scripture at the left on the sidebar or click any of the buttons below the 2D map.')
 
 # Load data
 @st.cache_data
