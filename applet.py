@@ -24,7 +24,7 @@ def moveUp():
     top = st.session_state.top50
     val = top['tsne_y'].max()
     #pick the row in the top dataframe where tsne_y equals val
-    row = top[top['tsne_y'] == val]]
+    row = top[top['tsne_y'] == val]
     st.session_state.book = row['book_title'].iloc[0]
     st.session_state.chapter = row['chapter_number'].iloc[0]
     st.session_state.verse = row['verse_number'].iloc[0]
