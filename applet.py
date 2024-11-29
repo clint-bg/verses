@@ -93,8 +93,8 @@ data_plot = pd.concat([data_rand, top50])
 highlight = alt.selection_multi(fields=['group'])
 
 chart = alt.Chart(data_plot).mark_point().encode(
-    alt.X('tsne_x', scale=alt.Scale(domain=[top50['tsne_x'].min()*0.8, top50['tsne_x'].max()*1.2]), axis=None),
-    alt.Y('tsne_y', scale=alt.Scale(domain=[top50['tsne_y'].min()*0.8, top50['tsne_y'].max()*1.2]), axis=None),
+    alt.X('tsne_x', scale=alt.Scale(domain=[top50['tsne_x'].min()-10, top50['tsne_x'].max()+10]), axis=None),
+    alt.Y('tsne_y', scale=alt.Scale(domain=[top50['tsne_y'].min()-10, top50['tsne_y'].max()+10]), axis=None),
     color=alt.condition(highlight, 'group', alt.value('lightgray')),  # Highlight selected points
     tooltip=['verse_short_title','cluster']
 ).add_selection(highlight).interactive()
