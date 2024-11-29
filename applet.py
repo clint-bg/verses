@@ -32,9 +32,14 @@ def setref(i):
     return set(row)
 
 def set(row):
-    st.session_state.book = row['book_title'].iloc[0]
-    st.session_state.chapter = row['chapter_number'].iloc[0]
-    st.session_state.verse = row['verse_number'].iloc[0]
+    try:
+        st.session_state.book = row['book_title'].iloc[0]
+        st.session_state.chapter = row['chapter_number'].iloc[0]
+        st.session_state.verse = row['verse_number'].iloc[0]
+    except:
+        st.session_state.book = row['book_title']
+        st.session_state.chapter = row['chapter_number']
+        st.session_state.verse = row['verse_number']
 
 book = st.sidebar.selectbox('Book', data['book_title'].unique(), key='book')
 # Filter dataframe based on selected country
@@ -84,6 +89,7 @@ st.button('Move Up', key='move_up', on_click=moveUp)
 
 for i in range(10):
     textval = top50['verse_short_title'].iloc[i]
+    st.write(i)
     st.button(textval, on_click=lambda: setref(i))
     st.write(f'{top50['scripture_text'].iloc[i]}')
 
