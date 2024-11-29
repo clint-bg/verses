@@ -83,8 +83,8 @@ st.markdown('---')
 st.button('Move Up', key='move_up', on_click=moveUp)
 
 for i in range(10):
-#    textval = top50['verse_short_title'].iloc[i]
-#    st.button(textval,on_click=setref(i))
+    textval = top50['verse_short_title'].iloc[i]
+    st.button(textval, on_click=lambda: setref(i))
     st.write(f'{top50['scripture_text'].iloc[i]}')
 
 st.write(st.session_state)
