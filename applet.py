@@ -99,9 +99,9 @@ st.altair_chart(chart, use_container_width=True)
 st.markdown('---')
 
 st.button('Move Up', key='move_up', on_click=moveUp)
-st.button('Move Down', key='move_up', on_click=moveDown)
-st.button('Move Right', key='move_up', on_click=moveRight)
-st.button('Move Left', key='move_up', on_click=moveLeft)
+st.button('Move Down', key='move_down', on_click=moveDown)
+st.button('Move Right', key='move_right', on_click=moveRight)
+st.button('Move Left', key='move_left', on_click=moveLeft)
 
 st.markdown('---')
 
