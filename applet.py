@@ -59,11 +59,11 @@ book = st.sidebar.selectbox('Book', data['book_title'].unique(), key='book', ind
 f1_df = data[data["book_title"] == book]
 chapter = st.sidebar.selectbox('Chapter', f1_df['chapter_number'].unique(),key='chapter', index=2)
 f2_df = f1_df[f1_df["chapter_number"] == chapter]
-try:
-    verse = st.sidebar.selectbox('Verse', f2_df['verse_number'].unique(),key='verse', index=15)
-except:
-    verse = f2_df['verse_number'].iloc[0]
-    st.session_state.verse = verse
+if len(f2_df['verse_number'].unique()) >= 16:
+    vnum = 15
+else:
+    vnum = 0
+verse = st.sidebar.selectbox('Verse', f2_df['verse_number'].unique(),key='verse', index=vnum)
 st.write(f'You selected {book} {chapter}:{verse}')
 
 #get data subset based on selected verse
