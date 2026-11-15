@@ -1,0 +1,1364 @@
+/* ==========================================================================
+   1. ROOT TOKENS, DARK MODE & SCROLLBARS (modern-web-guidance: dark-mode)
+   ========================================================================== */
+:root {
+  /* Raw Light Tokens */
+  --bg-canvas-light: #f6f5f0;
+  --bg-surface-light: #ffffff;
+  --bg-elevated-light: #efede6;
+  --bg-subtle-light: #e6e3d8;
+  --text-primary-light: #1a1917;
+  --text-secondary-light: #57534e;
+  --text-muted-light: #78716c;
+  --border-color-light: #dcd8cd;
+  --brand-accent-light: #2b59c3;
+  --brand-accent-soft-light: #e0e8f9;
+  --sim-accent-light: #0f766e;
+  --sim-accent-soft-light: #ccfbf1;
+  --scrollbar-thumb-light: #78716c;
+  --scrollbar-track-light: #eae7de;
+
+  /* Raw Dark Tokens */
+  --bg-canvas-dark: #111318;
+  --bg-surface-dark: #1a1d24;
+  --bg-elevated-dark: #232730;
+  --bg-subtle-dark: #2c313c;
+  --text-primary-dark: #f3f2ee;
+  --text-secondary-dark: #b5b2a8;
+  --text-muted-dark: #8a867c;
+  --border-color-dark: #2f3542;
+  --brand-accent-dark: #7aa2f7;
+  --brand-accent-soft-dark: #1e2942;
+  --sim-accent-dark: #2dd4bf;
+  --sim-accent-soft-dark: #113231;
+  --scrollbar-thumb-dark: #8a867c;
+  --scrollbar-track-dark: #1a1d24;
+
+  /* Default (Light) Assignments */
+  --bg-canvas: var(--bg-canvas-light);
+  --bg-surface: var(--bg-surface-light);
+  --bg-elevated: var(--bg-elevated-light);
+  --bg-subtle: var(--bg-subtle-light);
+  --text-primary: var(--text-primary-light);
+  --text-secondary: var(--text-secondary-light);
+  --text-muted: var(--text-muted-light);
+  --border-color: var(--border-color-light);
+  --accent: var(--brand-accent-light);
+  --accent-soft: var(--brand-accent-soft-light);
+  --sim-accent: var(--sim-accent-light);
+  --sim-accent-soft: var(--sim-accent-soft-light);
+  --scrollbar-thumb: var(--scrollbar-thumb-light);
+  --scrollbar-track: var(--scrollbar-track-light);
+
+  /* MANDATORY: Fallback for browsers without light-dark() support */
+  @media (prefers-color-scheme: dark) {
+    --bg-canvas: var(--bg-canvas-dark);
+    --bg-surface: var(--bg-surface-dark);
+    --bg-elevated: var(--bg-elevated-dark);
+    --bg-subtle: var(--bg-subtle-dark);
+    --text-primary: var(--text-primary-dark);
+    --text-secondary: var(--text-secondary-dark);
+    --text-muted: var(--text-muted-dark);
+    --border-color: var(--border-color-dark);
+    --accent: var(--brand-accent-dark);
+    --accent-soft: var(--brand-accent-soft-dark);
+    --sim-accent: var(--sim-accent-dark);
+    --sim-accent-soft: var(--sim-accent-soft-dark);
+    --scrollbar-thumb: var(--scrollbar-thumb-dark);
+    --scrollbar-track: var(--scrollbar-track-dark);
+  }
+
+  /* Modern light-dark() adaptive tokens */
+  @supports (color: light-dark(white, black)) {
+    --bg-canvas: light-dark(var(--bg-canvas-light), var(--bg-canvas-dark));
+    --bg-surface: light-dark(var(--bg-surface-light), var(--bg-surface-dark));
+    --bg-elevated: light-dark(var(--bg-elevated-light), var(--bg-elevated-dark));
+    --bg-subtle: light-dark(var(--bg-subtle-light), var(--bg-subtle-dark));
+    --text-primary: light-dark(var(--text-primary-light), var(--text-primary-dark));
+    --text-secondary: light-dark(var(--text-secondary-light), var(--text-secondary-dark));
+    --text-muted: light-dark(var(--text-muted-light), var(--text-muted-dark));
+    --border-color: light-dark(var(--border-color-light), var(--border-color-dark));
+    --accent: light-dark(var(--brand-accent-light), var(--brand-accent-dark));
+    --accent-soft: light-dark(var(--brand-accent-soft-light), var(--brand-accent-soft-dark));
+    --sim-accent: light-dark(var(--sim-accent-light), var(--sim-accent-dark));
+    --sim-accent-soft: light-dark(var(--sim-accent-soft-light), var(--sim-accent-soft-dark));
+    --scrollbar-thumb: light-dark(var(--scrollbar-thumb-light), var(--scrollbar-thumb-dark));
+    --scrollbar-track: light-dark(var(--scrollbar-track-light), var(--scrollbar-track-dark));
+  }
+
+  /* MANDATORY: Apply color-scheme to :root for viewport-wide theming */
+  color-scheme: light dark;
+  accent-color: var(--accent);
+
+  /* Pair scrollbar-color with scrollbar-width for macOS; never animate scrollbar-color */
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+
+  --card-font-size: 1.32rem;
+  --bottom-nav-height: 4.25rem;
+  --header-height: 3.6rem;
+}
+
+/* Explicit Theme Overrides from Settings */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg-canvas: var(--bg-canvas-light);
+  --bg-surface: var(--bg-surface-light);
+  --bg-elevated: var(--bg-elevated-light);
+  --bg-subtle: var(--bg-subtle-light);
+  --text-primary: var(--text-primary-light);
+  --text-secondary: var(--text-secondary-light);
+  --text-muted: var(--text-muted-light);
+  --border-color: var(--border-color-light);
+  --accent: var(--brand-accent-light);
+  --accent-soft: var(--brand-accent-soft-light);
+  --sim-accent: var(--sim-accent-light);
+  --sim-accent-soft: var(--sim-accent-soft-light);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg-canvas: var(--bg-canvas-dark);
+  --bg-surface: var(--bg-surface-dark);
+  --bg-elevated: var(--bg-elevated-dark);
+  --bg-subtle: var(--bg-subtle-dark);
+  --text-primary: var(--text-primary-dark);
+  --text-secondary: var(--text-secondary-dark);
+  --text-muted: var(--text-muted-dark);
+  --border-color: var(--border-color-dark);
+  --accent: var(--brand-accent-dark);
+  --accent-soft: var(--brand-accent-soft-dark);
+  --sim-accent: var(--sim-accent-dark);
+  --sim-accent-soft: var(--sim-accent-soft-dark);
+}
+
+:root[data-font-size="sm"] { --card-font-size: 1.1rem; }
+:root[data-font-size="md"] { --card-font-size: 1.32rem; }
+:root[data-font-size="lg"] { --card-font-size: 1.55rem; }
+:root[data-font-size="xl"] { --card-font-size: 1.82rem; }
+
+/* Legacy fallback for WebKit/Blink browsers without scrollbar-color */
+@supports not (scrollbar-color: auto) {
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+  }
+  *::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+  }
+}
+
+/* ==========================================================================
+   2. DIRECTIONAL VIEW TRANSITIONS (modern-web-guidance: directional-navigation-transitions)
+   ========================================================================== */
+@keyframes slide-to-left {
+  to { transform: translateX(-35%); opacity: 0; }
+}
+@keyframes slide-from-right {
+  from { transform: translateX(35%); opacity: 0; }
+}
+@keyframes slide-to-right {
+  to { transform: translateX(35%); opacity: 0; }
+}
+@keyframes slide-from-left {
+  from { transform: translateX(-35%); opacity: 0; }
+}
+@keyframes slide-to-top {
+  to { transform: translateY(-35%); opacity: 0; }
+}
+@keyframes slide-from-bottom {
+  from { transform: translateY(35%); opacity: 0; }
+}
+@keyframes slide-to-bottom {
+  to { transform: translateY(35%); opacity: 0; }
+}
+@keyframes slide-from-top {
+  from { transform: translateY(-35%); opacity: 0; }
+}
+
+::view-transition-group(root),
+::view-transition-group(scripture-card) {
+  /* Non-linear timing function for natural feel */
+  animation: 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+#view-read.is-active .scripture-card {
+  view-transition-name: scripture-card;
+}
+
+/* Directional View Transition Types */
+html:active-view-transition-type(swipe-right)::view-transition-old(scripture-card) {
+  animation-name: slide-to-right;
+}
+html:active-view-transition-type(swipe-right)::view-transition-new(scripture-card) {
+  animation-name: slide-from-left;
+}
+
+html:active-view-transition-type(swipe-left)::view-transition-old(scripture-card) {
+  animation-name: slide-to-left;
+}
+html:active-view-transition-type(swipe-left)::view-transition-new(scripture-card) {
+  animation-name: slide-from-right;
+}
+
+html:active-view-transition-type(swipe-up)::view-transition-old(scripture-card) {
+  animation-name: slide-to-top;
+}
+html:active-view-transition-type(swipe-up)::view-transition-new(scripture-card) {
+  animation-name: slide-from-bottom;
+}
+
+html:active-view-transition-type(swipe-down)::view-transition-old(scripture-card) {
+  animation-name: slide-to-bottom;
+}
+html:active-view-transition-type(swipe-down)::view-transition-new(scripture-card) {
+  animation-name: slide-from-top;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(root),
+  ::view-transition-group(scripture-card) {
+    animation: none !important;
+  }
+}
+
+/* ==========================================================================
+   3. BASE RESET & NATURAL INTERACTIONS (modern-web-guidance: natural-interactions)
+   ========================================================================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+:where(button) {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  transition: box-shadow 150ms ease-out, scale 150ms ease-out, background-color 150ms ease-out;
+}
+
+button:hover:not(:disabled) {
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.16);
+}
+
+button:active:not(:disabled) {
+  scale: 0.97;
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+/* Accessible focus ring with >= 3:1 contrast against canvas */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid CanvasText;
+  outline-offset: 3px;
+}
+
+/* Horizontal swipeable scroller */
+.scroller {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-block: 0.25rem;
+  scrollbar-width: none;
+}
+.scroller::-webkit-scrollbar {
+  display: none;
+}
+.scroller > * {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+}
+
+/* ==========================================================================
+   4. APP SHELL & HEADER
+   ========================================================================== */
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-block-size: 100dvh;
+  max-block-size: 100dvh;
+  overflow: hidden;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  block-size: var(--header-height);
+  padding-inline: 1rem;
+  background-color: var(--bg-surface);
+  border-block-end: 1px solid var(--border-color);
+  flex-shrink: 0;
+  z-index: 20;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.brand-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 2rem;
+  block-size: 2rem;
+  border-radius: 0.55rem;
+  background-color: var(--accent-soft);
+  color: var(--accent);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.brand-titles {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.brand-subtitle {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.42rem 0.7rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-elevated);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   5. MAIN VIEWPORT & SWIPE STAGE
+   ========================================================================== */
+.app-main {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-view {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+#view-read,
+#view-map {
+  flex: 1 1 0%;
+  min-block-size: 0;
+}
+
+.app-view[hidden] {
+  display: none !important;
+}
+
+.read-layout {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  max-inline-size: 56rem;
+  inline-size: 100%;
+  margin-inline: auto;
+  padding: 0.65rem 0.85rem;
+  gap: 0.65rem;
+  min-block-size: 0;
+}
+
+/* Anchor Context Banner */
+.anchor-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.45rem 0.75rem;
+  border-radius: 0.65rem;
+  background-color: var(--sim-accent-soft);
+  border: 1px solid var(--sim-accent);
+  font-size: 0.84rem;
+}
+
+.anchor-banner[hidden] {
+  display: none !important;
+}
+
+.anchor-banner-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.anchor-badge {
+  background-color: var(--sim-accent);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.74rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.anchor-dist {
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.anchor-banner-actions {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.pill-btn {
+  padding: 0.3rem 0.68rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-surface);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.pill-btn-subtle {
+  background-color: transparent;
+}
+
+/* Swipe Stage */
+.swipe-stage {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: 16rem;
+  padding: 0.35rem 0;
+  user-select: none;
+  touch-action: none;
+}
+
+/* The Scripture Card */
+.scripture-card {
+  position: relative;
+  inline-size: min(100%, 44rem);
+  max-block-size: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 1.25rem;
+  padding: 1.35rem 1.5rem;
+  box-shadow: 0 10px 30px -10px rgb(0 0 0 / 0.12), 0 2px 6px rgb(0 0 0 / 0.05);
+  cursor: grab;
+  will-change: transform;
+  touch-action: none;
+  overflow: hidden;
+}
+
+.scripture-card:active {
+  cursor: grabbing;
+}
+
+/* Live Gesture Direction Overlay Badge */
+.gesture-badge {
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 15;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  background-color: var(--accent);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgb(0 0 0 / 0.25);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.gesture-badge.is-similarity {
+  background-color: var(--sim-accent);
+}
+
+.card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  border-block-end: 1px solid var(--border-color);
+  padding-block-end: 0.75rem;
+}
+
+.card-meta-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.volume-pill {
+  font-size: 0.73rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  background-color: var(--accent-soft);
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+}
+
+.cluster-pill {
+  font-size: 0.73rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background-color: var(--bg-elevated);
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+}
+
+.card-title-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.card-reference {
+  margin: 0;
+  font-size: clamp(1.35rem, 3.5vw, 1.85rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.card-picker-trigger {
+  padding: 0.25rem 0.6rem;
+  border-radius: 0.45rem;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-elevated);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.card-similarity-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.sim-indicator-dot {
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  border-radius: 50%;
+  background-color: var(--sim-accent);
+  flex-shrink: 0;
+}
+
+.card-body {
+  flex: 1;
+  overflow-y: auto;
+  padding-block: 1.1rem;
+  display: flex;
+  align-items: center;
+  touch-action: pan-y;
+}
+
+.scripture-text {
+  margin: 0;
+  font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+  font-size: var(--card-font-size);
+  line-height: 1.65;
+  color: var(--text-primary);
+  text-wrap: pretty;
+}
+
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding-block-start: 0.75rem;
+  border-block-start: 1px solid var(--border-color);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.card-coords {
+  font-variant-numeric: tabular-nums;
+}
+
+.card-quick-links {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.text-action-btn {
+  background: none;
+  border: none;
+  padding: 0.2rem 0.4rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--accent);
+  border-radius: 0.35rem;
+}
+
+/* ==========================================================================
+   6. 4-WAY COMPASS CONTROLS BAR
+   ========================================================================== */
+.compass-controls {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr 1fr;
+  gap: 0.5rem;
+  align-items: stretch;
+  flex-shrink: 0;
+}
+
+.compass-vertical-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.compass-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-surface);
+  text-align: left;
+  min-inline-size: 0;
+}
+
+.compass-right {
+  justify-content: flex-end;
+}
+
+.compass-up,
+.compass-down {
+  padding: 0.35rem 0.65rem;
+  background-color: var(--bg-elevated);
+}
+
+.compass-arrow {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.compass-up .compass-arrow,
+.compass-down .compass-arrow {
+  color: var(--sim-accent);
+}
+
+.compass-text {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+  overflow: hidden;
+}
+
+.compass-text-right {
+  text-align: right;
+}
+
+.compass-type {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.compass-ref {
+  font-size: 0.83rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ==========================================================================
+   7. BOTTOM APP NAVIGATION BAR (modern-web-guidance: navbar aria-current)
+   ========================================================================== */
+.bottom-nav {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  block-size: var(--bottom-nav-height);
+  background-color: var(--bg-surface);
+  border-block-start: 1px solid var(--border-color);
+  padding-inline: 0.25rem;
+  padding-block-end: env(safe-area-inset-bottom, 0px);
+  flex-shrink: 0;
+  z-index: 25;
+}
+
+.bottom-nav-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 0.35rem 0.25rem;
+  border-radius: 0.5rem;
+}
+
+.bottom-nav-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+/* MANDATORY: Indicate active navigation item with both color AND shape (WCAG 1.4.1) */
+.bottom-nav-item[aria-current="page"] {
+  color: var(--accent);
+}
+
+.bottom-nav-item[aria-current="page"]::before {
+  content: "";
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 22%;
+  border-block-start: 3px solid var(--accent);
+  border-radius: 0 0 3px 3px;
+}
+
+/* ==========================================================================
+   8. SECONDARY VIEWS (SELECT, SIMILAR, 2D MAP, ABOUT)
+   ========================================================================== */
+.view-container {
+  max-inline-size: 62rem;
+  inline-size: 100%;
+  margin-inline: auto;
+  padding: 1.1rem 1rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.view-header h2 {
+  margin: 0 0 0.2rem 0;
+  font-size: 1.35rem;
+}
+
+.view-subtitle {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+
+.view-header-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+/* Featured Chips Bar */
+.featured-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 0.75rem;
+  padding: 0.45rem 0.75rem;
+}
+
+.featured-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.chip-btn {
+  padding: 0.28rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-elevated);
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.browse-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.browse-section-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 750;
+}
+
+.tabpanel-inner {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 0.9rem;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.volume-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.vol-filter-btn {
+  padding: 0.32rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-elevated);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.vol-filter-btn.is-selected {
+  background-color: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+}
+
+.picker-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 1fr;
+  gap: 0.85rem;
+}
+
+.picker-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  min-inline-size: 0;
+}
+
+.picker-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.native-select,
+.compact-select,
+.search-input {
+  padding: 0.5rem 0.65rem;
+  border-radius: 0.55rem;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-elevated);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 0.88rem;
+}
+
+.picker-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  max-block-size: 14rem;
+  overflow-y: auto;
+  padding-inline-end: 0.25rem;
+}
+
+.picker-item-btn {
+  text-align: left;
+  padding: 0.4rem 0.6rem;
+  border-radius: 0.45rem;
+  border: 1px solid transparent;
+  background-color: transparent;
+  font-size: 0.84rem;
+}
+
+.picker-item-btn.is-selected {
+  background-color: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent);
+  font-weight: 700;
+}
+
+.picker-number-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(2.5rem, 1fr));
+  gap: 0.3rem;
+  max-block-size: 14rem;
+  overflow-y: auto;
+  align-content: start;
+}
+
+.num-pill-btn {
+  padding: 0.38rem 0.2rem;
+  border-radius: 0.45rem;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-elevated);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.num-pill-btn.is-selected {
+  background-color: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+}
+
+.picker-preview-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 0.75rem;
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+}
+
+.picker-preview-info {
+  flex: 1;
+  min-inline-size: 0;
+}
+
+.picker-preview-info p {
+  margin: 0.25rem 0 0;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+
+.primary-btn {
+  padding: 0.55rem 1rem;
+  border-radius: 0.6rem;
+  border: none;
+  background-color: var(--accent);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.88rem;
+  white-space: nowrap;
+}
+
+/* Search Tab */
+.search-bar-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.search-input {
+  flex: 1;
+}
+
+.search-meta {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.search-results-list,
+.similar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.verse-list-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.85rem 1rem;
+  border-radius: 0.75rem;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  text-align: left;
+}
+
+.verse-list-card.is-current {
+  border-color: var(--accent);
+  background-color: var(--accent-soft);
+}
+
+.verse-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.verse-list-title {
+  font-weight: 750;
+  font-size: 0.96rem;
+}
+
+.verse-list-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+}
+
+.dist-pill {
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background-color: var(--sim-accent-soft);
+  color: var(--sim-accent);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.verse-list-text {
+  margin: 0;
+  font-family: Georgia, serif;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+/* ==========================================================================
+   9. 2D t-SNE MAP VIEW
+   ========================================================================== */
+.map-view-container {
+  flex: 1;
+  min-block-size: 0;
+  padding-block-end: 0.75rem;
+}
+
+.map-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.map-controls-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.map-canvas-wrapper {
+  position: relative;
+  flex: 1;
+  min-block-size: 20rem;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 0.9rem;
+  overflow: hidden;
+}
+
+#tsne-canvas {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.map-inspector {
+  position: absolute;
+  inset-block-end: 0.75rem;
+  inset-inline: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 0.9rem;
+  border-radius: 0.75rem;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.18);
+}
+
+.map-inspector-info {
+  flex: 1;
+  min-inline-size: 0;
+}
+
+.map-inspector-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  background-color: var(--accent-soft);
+  color: var(--accent);
+  margin-inline-end: 0.35rem;
+}
+
+.map-inspector-coords {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  margin-inline-start: 0.35rem;
+}
+
+.map-inspector-text {
+  margin: 0.2rem 0 0;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.map-spatial-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.75rem;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  font-size: 0.8rem;
+}
+
+.spatial-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+/* ==========================================================================
+   10. ABOUT & SETTINGS VIEW
+   ========================================================================== */
+.about-container {
+  gap: 1.1rem;
+}
+
+.about-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 0.9rem;
+  padding: 1.25rem;
+}
+
+.about-card h2,
+.about-card h3 {
+  margin-block-start: 0;
+}
+
+.about-feature-list {
+  padding-inline-start: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.external-links-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-block-start: 1rem;
+}
+
+.ext-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.85rem;
+  border-radius: 0.55rem;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-elevated);
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.settings-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding-block-end: 0.75rem;
+  border-block-end: 1px solid var(--border-color);
+}
+
+.setting-row:last-child {
+  border-block-end: none;
+  padding-block-end: 0;
+}
+
+.setting-desc {
+  margin: 0.15rem 0 0;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   11. MODAL DIALOG (modern-web-guidance: dialog)
+   ========================================================================== */
+dialog {
+  border: 1px solid var(--border-color);
+  border-radius: 1rem;
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  padding: 0;
+  max-inline-size: min(92dvw, 32rem);
+  inline-size: 100%;
+  box-shadow: 0 20px 45px rgb(0 0 0 / 0.3);
+}
+
+/* MANDATORY (both rules): prevent scrolling behind modal dialog */
+dialog:modal {
+  overscroll-behavior: contain;
+}
+
+dialog::backdrop {
+  background-color: rgb(0 0 0 / 0.5);
+  backdrop-filter: blur(3px);
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+.dialog-content {
+  padding: 1.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.dialog-header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.guide-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.guide-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.65rem;
+  border-radius: 0.65rem;
+  background-color: var(--bg-elevated);
+}
+
+.guide-icon {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.guide-item p {
+  margin: 0.2rem 0 0;
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+kbd {
+  display: inline-block;
+  padding: 0.1rem 0.38rem;
+  font-size: 0.78rem;
+  border-radius: 0.3rem;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-surface);
+}
+
+/* ==========================================================================
+   12. RESPONSIVE BREAKPOINTS
+   ========================================================================== */
+@media (max-width: 720px) {
+  .btn-label-desktop {
+    display: none;
+  }
+
+  .picker-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .picker-list,
+  .picker-number-grid {
+    max-block-size: 9.5rem;
+  }
+
+  .edge-left,
+  .edge-right {
+    display: none;
+  }
+
+  .scripture-card {
+    inline-size: 100%;
+    padding: 1.1rem 1.15rem;
+  }
+
+  .compass-controls {
+    grid-template-columns: 1fr 1.25fr 1fr;
+    gap: 0.35rem;
+  }
+
+  .compass-btn {
+    padding: 0.4rem 0.5rem;
+  }
+}

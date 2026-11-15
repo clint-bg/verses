@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <!-- MANDATORY: Declare support for both light and dark themes to prevent FOUC -->
+  <meta name="color-scheme" content="light dark">
+  <title>Verses — Scripture Swipe &amp; t-SNE Explorer</title>
+  <meta name="description" content="Explore over 41,995 verses of scripture chronologically by swiping left/right, or discover semantically similar scriptures via t-SNE embeddings by swiping up/down.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Top App Header -->
+    <header class="app-header">
+      <div class="header-brand">
+        <span class="brand-logo" aria-hidden="true">✦</span>
+        <div class="brand-titles">
+          <h1 class="brand-title">verses</h1>
+          <span class="brand-subtitle" id="header-status">Loading 41,995 verses…</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button
+          type="button"
+          class="icon-btn"
+          id="random-verse-header-btn"
+          title="Jump to a random scripture"
+          aria-label="Jump to a random scripture"
+        >
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="3"></rect>
+            <circle cx="8.5" cy="8.5" r="1.25" fill="currentColor"></circle>
+            <circle cx="15.5" cy="8.5" r="1.25" fill="currentColor"></circle>
+            <circle cx="12" cy="12" r="1.25" fill="currentColor"></circle>
+            <circle cx="8.5" cy="15.5" r="1.25" fill="currentColor"></circle>
+            <circle cx="15.5" cy="15.5" r="1.25" fill="currentColor"></circle>
+          </svg>
+          <span class="btn-label-desktop">Random</span>
+        </button>
+
+        <button
+          type="button"
+          class="icon-btn"
+          id="shortcuts-btn"
+          command="show-modal"
+          commandfor="shortcuts-dialog"
+          title="Swipe &amp; Keyboard Guide"
+          aria-label="Swipe and Keyboard Guide"
+        >
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          <span class="btn-label-desktop">Guide</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Viewport Area -->
+    <main class="app-main" id="app-main">
+
+      <!-- VIEW 1: SWIPE / READ -->
+      <section class="app-view is-active" id="view-read" aria-labelledby="nav-read-label">
+        <div class="read-layout">
+          <!-- Anchor Context Banner (shown when browsing similar scriptures via Up/Down) -->
+          <div class="anchor-banner" id="anchor-banner" hidden>
+            <div class="anchor-banner-info">
+              <span class="anchor-badge" id="anchor-rank-badge">Similar #1</span>
+              <span class="anchor-text">
+                Closest to <strong id="anchor-ref-text">1 Nephi 12:4</strong>
+                <span class="anchor-dist" id="anchor-dist-text">(Δ 0.08)</span>
+              </span>
+            </div>
+            <div class="anchor-banner-actions">
+              <button type="button" class="pill-btn" id="return-anchor-btn" title="Return to anchor scripture">
+                Return to Anchor
+              </button>
+              <button type="button" class="pill-btn pill-btn-subtle" id="make-anchor-btn" title="Make this verse the new similarity anchor">
+                Set as Anchor
+              </button>
+            </div>
+          </div>
+
+          <!-- Interactive 4-Way Swipe Stage -->
+          <div class="swipe-stage" id="swipe-stage" aria-live="polite">
+            <!-- The Scripture Card -->
+            <article class="scripture-card" id="scripture-card" tabindex="0" aria-label="Current scripture card. Use arrow keys or swipe in 4 directions to navigate.">
+              <!-- Live Gesture Overlay Badge -->
+              <div class="gesture-badge" id="gesture-badge" hidden></div>
+
+              <header class="card-header">
+                <div class="card-meta-top">
+                  <span class="volume-pill" id="card-volume">Book of Mormon</span>
+                  <span class="cluster-pill" id="card-cluster" title="t-SNE Cluster &amp; 2D Coordinates">Cluster 99</span>
+                </div>
+
+                <div class="card-title-row">
+                  <h2 class="card-reference" id="card-reference">1 Nephi 12:4</h2>
+                  <button
+                    type="button"
+                    class="card-picker-trigger"
+                    id="card-change-ref-btn"
+                    title="Pick another Book, Chapter, or Verse"
+                  >
+                    Change ▾
+                  </button>
+                </div>
+
+                <div class="card-similarity-bar" id="card-similarity-bar">
+                  <span class="sim-indicator-dot"></span>
+                  <span id="card-similarity-status">Anchor Scripture • Swipe ↑/↓ for closest by t-SNE</span>
+                </div>
+              </header>
+
+              <div class="card-body" id="card-body">
+                <p class="scripture-text" id="card-text">
+                  Loading scripture text…
+                </p>
+              </div>
+
+              <footer class="card-footer">
+                <div class="card-coords" id="card-coords">
+                  t-SNE: (0.00, 0.00)
+                </div>
+                <div class="card-quick-links">
+                  <button type="button" class="text-action-btn" id="card-view-similar-btn">
+                    Top 50 Similar →
+                  </button>
+                  <button type="button" class="text-action-btn" id="card-view-map-btn">
+                    View on 2D Map →
+                  </button>
+                </div>
+              </footer>
+            </article>
+          </div>
+
+          <!-- 4-Way Navigation Compass / Controls Bar -->
+          <div class="compass-controls" role="group" aria-label="Four-way scripture navigation controls">
+            <button type="button" class="compass-btn compass-left" id="btn-swipe-left" title="Previous chronological verse (Left Arrow or Swipe Left)">
+              <span class="compass-arrow" aria-hidden="true">←</span>
+              <span class="compass-text">
+                <span class="compass-type">Prev Verse</span>
+                <strong class="compass-ref" id="btn-left-ref">1 Ne. 12:3</strong>
+              </span>
+            </button>
+
+            <div class="compass-vertical-group">
+              <button type="button" class="compass-btn compass-up" id="btn-swipe-up" title="Next closest verse by t-SNE distance (Up Arrow or Swipe Up)">
+                <span class="compass-arrow" aria-hidden="true">↑</span>
+                <span class="compass-text">
+                  <span class="compass-type" id="btn-up-type">Closest #1 (t-SNE)</span>
+                  <strong class="compass-ref" id="btn-up-ref">1 Sam. 14:15</strong>
+                </span>
+              </button>
+
+              <button type="button" class="compass-btn compass-down" id="btn-swipe-down" title="Previous in t-SNE similarity list (Down Arrow or Swipe Down)">
+                <span class="compass-arrow" aria-hidden="true">↓</span>
+                <span class="compass-text">
+                  <span class="compass-type" id="btn-down-type">Closest #50 (t-SNE)</span>
+                  <strong class="compass-ref" id="btn-down-ref">—</strong>
+                </span>
+              </button>
+            </div>
+
+            <button type="button" class="compass-btn compass-right" id="btn-swipe-right" title="Next chronological verse (Right Arrow or Swipe Right)">
+              <span class="compass-text compass-text-right">
+                <span class="compass-type">Next Verse</span>
+                <strong class="compass-ref" id="btn-right-ref">1 Ne. 12:5</strong>
+              </span>
+              <span class="compass-arrow" aria-hidden="true">→</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 2: SELECT & SEARCH -->
+      <section class="app-view" id="view-select" aria-labelledby="nav-select-label" hidden>
+        <div class="view-container">
+          <div class="view-header">
+            <h2>Select or Search Scripture</h2>
+            <p class="view-subtitle">Search any word or reference across all 41,995 verses, or browse by Book, Chapter, and Verse below.</p>
+          </div>
+
+          <!-- Always-Visible Live Search Bar -->
+          <div class="tabpanel-inner search-section-card">
+            <label class="picker-label" for="search-input">Search Keyword, Phrase, or Reference</label>
+            <div class="search-bar-row">
+              <input
+                type="search"
+                id="search-input"
+                class="search-input"
+                placeholder="Type words (e.g. 'mist of darkness', 'charity') or reference ('1 Nephi 12:4')…"
+                aria-label="Search scripture text or reference"
+                autocomplete="off"
+              >
+              <button type="button" class="pill-btn" id="search-clear-btn" hidden>Clear</button>
+              <button type="button" class="primary-btn" id="search-submit-btn">Search</button>
+            </div>
+            <div class="search-meta" id="search-meta">
+              Start typing to search all 41,995 verses instantly, or press Enter to jump to a matching reference.
+            </div>
+            <div class="search-results-list" id="search-results-list"></div>
+          </div>
+
+          <!-- Featured Quick Jumps Scroller -->
+          <div class="featured-bar">
+            <span class="featured-label">Quick Jump:</span>
+            <div class="scroller" role="region" aria-label="Featured scriptures">
+              <button type="button" class="chip-btn" data-jump-ref="1 Nephi 12:4">1 Nephi 12:4</button>
+              <button type="button" class="chip-btn" data-jump-ref="John 3:16">John 3:16</button>
+              <button type="button" class="chip-btn" data-jump-ref="Genesis 1:1">Genesis 1:1</button>
+              <button type="button" class="chip-btn" data-jump-ref="Alma 32:21">Alma 32:21</button>
+              <button type="button" class="chip-btn" data-jump-ref="Moroni 10:4">Moroni 10:4</button>
+              <button type="button" class="chip-btn" data-jump-ref="Proverbs 3:5">Proverbs 3:5</button>
+              <button type="button" class="chip-btn" data-jump-ref="Matthew 5:14">Matthew 5:14</button>
+              <button type="button" class="chip-btn" data-jump-ref="Doctrine and Covenants 88:118">D&amp;C 88:118</button>
+              <button type="button" class="chip-btn" data-jump-ref="Moses 1:39">Moses 1:39</button>
+            </div>
+          </div>
+
+          <!-- Browse by Book / Chapter / Verse -->
+          <div class="tabpanel-inner" id="panel-browse">
+            <div class="browse-header-row">
+              <h3 class="browse-section-title">Browse Book / Chapter / Verse</h3>
+              <!-- Volume Filter Pills -->
+              <div class="volume-filter-row" role="group" aria-label="Filter by scripture volume">
+                <button type="button" class="vol-filter-btn is-selected" data-volume="all">All (87)</button>
+                <button type="button" class="vol-filter-btn" data-volume="Old Testament">Old Testament</button>
+                <button type="button" class="vol-filter-btn" data-volume="New Testament">New Testament</button>
+                <button type="button" class="vol-filter-btn" data-volume="Book of Mormon">Book of Mormon</button>
+                <button type="button" class="vol-filter-btn" data-volume="Doctrine and Covenants">D&amp;C</button>
+                <button type="button" class="vol-filter-btn" data-volume="Pearl of Great Price">Pearl of Great Price</button>
+              </div>
+            </div>
+
+            <!-- Preview of Selected Verse in Picker (Placed at top of picker for immediate visibility & action) -->
+            <div class="picker-preview-card">
+              <div class="picker-preview-info">
+                <strong id="picker-preview-ref">1 Nephi 12:4</strong>
+                <p id="picker-preview-text">Select a book, chapter, and verse below.</p>
+              </div>
+              <button type="button" class="primary-btn" id="picker-go-btn">
+                Open Verse →
+              </button>
+            </div>
+
+            <div class="picker-grid">
+              <!-- Book Column -->
+              <div class="picker-column">
+                <label class="picker-label" for="select-book">1. Book</label>
+                <select id="select-book" class="native-select"></select>
+                <div class="picker-list" id="book-pill-list" role="listbox" aria-label="Books"></div>
+              </div>
+
+              <!-- Chapter Column -->
+              <div class="picker-column">
+                <label class="picker-label" for="select-chapter">2. Chapter</label>
+                <select id="select-chapter" class="native-select"></select>
+                <div class="picker-number-grid" id="chapter-pill-list" role="listbox" aria-label="Chapters"></div>
+              </div>
+
+              <!-- Verse Column -->
+              <div class="picker-column">
+                <label class="picker-label" for="select-verse">3. Verse</label>
+                <select id="select-verse" class="native-select"></select>
+                <div class="picker-number-grid" id="verse-pill-list" role="listbox" aria-label="Verses"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 3: TOP 50 SIMILAR LIST -->
+      <section class="app-view" id="view-similar" aria-labelledby="nav-similar-label" hidden>
+        <div class="view-container">
+          <div class="view-header">
+            <div class="view-header-top">
+              <div>
+                <h2>Top 50 Similar Scriptures</h2>
+                <p class="view-subtitle">
+                  Ranked by 2D t-SNE Euclidean distance from anchor <strong id="similar-anchor-title">1 Nephi 12:4</strong>.
+                </p>
+              </div>
+              <label class="filter-toggle-label">
+                <input type="checkbox" id="exclude-same-book-toggle">
+                <span>Different book only</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="similar-list" id="similar-list"></div>
+        </div>
+      </section>
+
+      <!-- VIEW 4: 2D t-SNE MAP -->
+      <section class="app-view" id="view-map" aria-labelledby="nav-map-label" hidden>
+        <div class="view-container map-view-container">
+          <div class="map-header-bar">
+            <div>
+              <h2>2D t-SNE Scripture Map</h2>
+              <p class="view-subtitle">
+                All 41,995 verses in 2D embedding space. Drag to pan, scroll/pinch to zoom, or tap any dot to inspect.
+              </p>
+            </div>
+            <div class="map-controls-bar">
+              <button type="button" class="pill-btn" id="map-focus-neighborhood-btn">Zoom to Top 50</button>
+              <button type="button" class="pill-btn" id="map-reset-zoom-btn">Full Map</button>
+              <select id="map-color-mode" class="compact-select" aria-label="Color points by">
+                <option value="highlight">Highlight Closest 50</option>
+                <option value="volume">Color by Volume</option>
+                <option value="cluster">Color by Cluster (0–99)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="map-canvas-wrapper" id="map-canvas-wrapper">
+            <canvas id="tsne-canvas" aria-label="Interactive 2D t-SNE scatter plot of 41,995 scriptures"></canvas>
+
+            <!-- Floating Map Tooltip / Selected Point Inspector -->
+            <div class="map-inspector" id="map-inspector">
+              <div class="map-inspector-info">
+                <span class="map-inspector-badge" id="map-inspector-badge">Current</span>
+                <strong id="map-inspector-ref">1 Nephi 12:4</strong>
+                <span class="map-inspector-coords" id="map-inspector-coords">(x: 0, y: 0)</span>
+                <p class="map-inspector-text" id="map-inspector-text"></p>
+              </div>
+              <button type="button" class="primary-btn compact-primary-btn" id="map-inspector-open-btn">
+                Swipe Here →
+              </button>
+            </div>
+          </div>
+
+          <!-- Original Streamlit Spatial Directional Buttons (Move Up / Down / Left / Right in Top 50 2D space) -->
+          <div class="map-spatial-bar" role="group" aria-label="Move across local 2D t-SNE neighborhood">
+            <span class="spatial-label">Jump to extreme of Top 50 neighborhood:</span>
+            <div class="spatial-btns">
+              <button type="button" class="pill-btn" id="spatial-up-btn" title="Jump to highest tsne_y in Top 50">↑ Move North (+Y)</button>
+              <button type="button" class="pill-btn" id="spatial-down-btn" title="Jump to lowest tsne_y in Top 50">↓ Move South (-Y)</button>
+              <button type="button" class="pill-btn" id="spatial-left-btn" title="Jump to lowest tsne_x in Top 50">← Move West (-X)</button>
+              <button type="button" class="pill-btn" id="spatial-right-btn" title="Jump to highest tsne_x in Top 50">→ Move East (+X)</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 5: ABOUT & SETTINGS -->
+      <section class="app-view" id="view-about" aria-labelledby="nav-about-label" hidden>
+        <div class="view-container about-container">
+          <div class="about-card">
+            <h2>About Verses</h2>
+            <p>
+              This interactive web app lets you explore over <strong>41,995 verses of scripture</strong> (Old Testament, New Testament, Book of Mormon, Doctrine and Covenants, and Pearl of Great Price) both chronologically and semantically:
+            </p>
+            <ul class="about-feature-list">
+              <li>
+                <strong>Swipe Right / Left (Chronological):</strong> Move sequentially to the next or previous scripture verse (for example, from <em>1 Nephi 12:4</em>, swiping right yields <em>1 Nephi 12:5</em> and swiping left yields <em>1 Nephi 12:3</em>).
+              </li>
+              <li>
+                <strong>Swipe Up / Down (t-SNE Similarity):</strong> Step through the scriptures that are closest in meaning based on Euclidean distance in the 2D t-SNE embedding space.
+              </li>
+            </ul>
+
+            <h3>How the Embeddings Were Created</h3>
+            <p>
+              Originally developed using Google's <code>generativeai</code> package, every verse across the standard works (41,995 verses) was processed with <code>text-embedding-004</code> and embedded into a 2D coordinate space using <strong>t-SNE</strong> (t-distributed Stochastic Neighbor Embedding), grouped into 100 clusters.
+            </p>
+            <div class="external-links-row">
+              <a href="https://www.kaggle.com/code/molecman/2d-map-of-the-scriptures" target="_blank" rel="noopener noreferrer" class="ext-link-btn">
+                📊 Kaggle Notebook: 2D Map of the Scriptures ↗
+              </a>
+              <a href="https://youtu.be/4l3hsg9JStQ" target="_blank" rel="noopener noreferrer" class="ext-link-btn">
+                ▶️ YouTube Video Description ↗
+              </a>
+              <a href="https://github.com/clint-bg/verses/" target="_blank" rel="noopener noreferrer" class="ext-link-btn">
+                💻 GitHub Repository ↗
+              </a>
+            </div>
+          </div>
+
+          <div class="about-card">
+            <h3>Reading &amp; Gesture Preferences</h3>
+            <div class="settings-grid">
+              <div class="setting-row">
+                <div>
+                  <strong>Horizontal Swipe Direction</strong>
+                  <p class="setting-desc">Choose how left/right swipes map to chronological verses.</p>
+                </div>
+                <select id="setting-swipe-mode" class="compact-select">
+                  <option value="direct">Swipe Right = Next (+1), Left = Prev (-1)</option>
+                  <option value="natural">Page Flip: Swipe Left = Next (+1), Right = Prev (-1)</option>
+                </select>
+              </div>
+
+              <div class="setting-row">
+                <div>
+                  <strong>Scripture Text Size</strong>
+                  <p class="setting-desc">Adjust card font size for comfortable reading.</p>
+                </div>
+                <select id="setting-font-size" class="compact-select">
+                  <option value="sm">Compact</option>
+                  <option value="md" selected>Standard</option>
+                  <option value="lg">Large</option>
+                  <option value="xl">Extra Large</option>
+                </select>
+              </div>
+
+              <div class="setting-row">
+                <div>
+                  <strong>Color Theme</strong>
+                  <p class="setting-desc">Follow system appearance or force light/dark theme.</p>
+                </div>
+                <select id="setting-theme" class="compact-select">
+                  <option value="auto" selected>System Default (Auto)</option>
+                  <option value="light">Light Mode</option>
+                  <option value="dark">Dark Mode</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Bottom App Navigation Bar -->
+    <nav class="bottom-nav" aria-label="Primary app navigation">
+      <button type="button" class="bottom-nav-item" data-view="read" aria-current="page">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4" y="2" width="16" height="20" rx="3"></rect>
+          <line x1="8" y1="7" x2="16" y2="7"></line>
+          <line x1="8" y1="11" x2="16" y2="11"></line>
+          <line x1="8" y1="15" x2="13" y2="15"></line>
+        </svg>
+        <span class="bottom-nav-label" id="nav-read-label">Swipe</span>
+      </button>
+
+      <button type="button" class="bottom-nav-item" data-view="select">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <span class="bottom-nav-label" id="nav-select-label">Select</span>
+      </button>
+
+      <button type="button" class="bottom-nav-item" data-view="similar">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="8" y1="6" x2="21" y2="6"></line>
+          <line x1="8" y1="12" x2="21" y2="12"></line>
+          <line x1="8" y1="18" x2="21" y2="18"></line>
+          <line x1="3" y1="6" x2="3.01" y2="6"></line>
+          <line x1="3" y1="12" x2="3.01" y2="12"></line>
+          <line x1="3" y1="18" x2="3.01" y2="18"></line>
+        </svg>
+        <span class="bottom-nav-label" id="nav-similar-label">Similar</span>
+      </button>
+
+      <button type="button" class="bottom-nav-item" data-view="map">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="6" cy="6" r="2"></circle>
+          <circle cx="18" cy="8" r="2"></circle>
+          <circle cx="12" cy="14" r="3"></circle>
+          <circle cx="7" cy="18" r="2"></circle>
+          <circle cx="17" cy="17" r="2"></circle>
+          <line x1="12" y1="14" x2="18" y2="8" stroke-dasharray="2 2"></line>
+          <line x1="12" y1="14" x2="7" y2="18" stroke-dasharray="2 2"></line>
+        </svg>
+        <span class="bottom-nav-label" id="nav-map-label">2D Map</span>
+      </button>
+
+      <button type="button" class="bottom-nav-item" data-view="about">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <span class="bottom-nav-label" id="nav-about-label">About</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Native Modal Dialog for Swipe & Keyboard Guide (follows `dialog` modern-web-guidance) -->
+  <dialog id="shortcuts-dialog" closedby="any" aria-labelledby="shortcuts-title">
+    <div class="dialog-content">
+      <div class="dialog-header">
+        <h2 id="shortcuts-title">How to Navigate Verses</h2>
+      </div>
+      <div class="dialog-body">
+        <div class="guide-grid">
+          <div class="guide-item">
+            <span class="guide-icon">👉</span>
+            <div>
+              <strong>Swipe Right (or <kbd>→</kbd>)</strong>
+              <p>Go to the <strong>next chronological scripture</strong> (e.g. <em>1 Nephi 12:4 → 1 Nephi 12:5</em>).</p>
+            </div>
+          </div>
+          <div class="guide-item">
+            <span class="guide-icon">👈</span>
+            <div>
+              <strong>Swipe Left (or <kbd>←</kbd>)</strong>
+              <p>Go to the <strong>previous chronological scripture</strong> (e.g. <em>1 Nephi 12:4 → 1 Nephi 12:3</em>).</p>
+            </div>
+          </div>
+          <div class="guide-item">
+            <span class="guide-icon">👆</span>
+            <div>
+              <strong>Swipe Up (or <kbd>↑</kbd>)</strong>
+              <p>Step forward to the <strong>next closest scripture by t-SNE distance</strong> (#1 closest, #2 closest, etc.).</p>
+            </div>
+          </div>
+          <div class="guide-item">
+            <span class="guide-icon">👇</span>
+            <div>
+              <strong>Swipe Down (or <kbd>↓</kbd>)</strong>
+              <p>Step back up the similarity list toward your anchor scripture (or jump into #1 closest when on the anchor).</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <form method="dialog" class="dialog-footer">
+        <button value="close" class="primary-btn" autofocus>Got It</button>
+      </form>
+    </div>
+  </dialog>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
