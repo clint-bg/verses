@@ -11,94 +11,27 @@
 </head>
 <body>
   <div class="app-shell">
-    <!-- Top App Header -->
-    <header class="app-header">
-      <div class="header-brand">
-        <span class="brand-logo" aria-hidden="true">✦</span>
-        <div class="brand-titles">
-          <h1 class="brand-title">verses</h1>
-          <span class="brand-subtitle" id="header-status">Loading 41,995 verses…</span>
-        </div>
-      </div>
-
-      <div class="header-actions">
-        <button
-          type="button"
-          class="icon-btn"
-          id="random-verse-header-btn"
-          title="Jump to a random scripture"
-          aria-label="Jump to a random scripture"
-        >
-          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="18" height="18" rx="3"></rect>
-            <circle cx="8.5" cy="8.5" r="1.25" fill="currentColor"></circle>
-            <circle cx="15.5" cy="8.5" r="1.25" fill="currentColor"></circle>
-            <circle cx="12" cy="12" r="1.25" fill="currentColor"></circle>
-            <circle cx="8.5" cy="15.5" r="1.25" fill="currentColor"></circle>
-            <circle cx="15.5" cy="15.5" r="1.25" fill="currentColor"></circle>
-          </svg>
-          <span class="btn-label-desktop">Random</span>
-        </button>
-
-        <button
-          type="button"
-          class="icon-btn"
-          id="shortcuts-btn"
-          command="show-modal"
-          commandfor="shortcuts-dialog"
-          title="Swipe &amp; Keyboard Guide"
-          aria-label="Swipe and Keyboard Guide"
-        >
-          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-            <line x1="12" y1="17" x2="12.01" y2="17"></line>
-          </svg>
-          <span class="btn-label-desktop">Guide</span>
-        </button>
-      </div>
-    </header>
-
     <!-- Main Viewport Area -->
     <main class="app-main" id="app-main">
 
       <!-- VIEW 1: SWIPE / READ -->
       <section class="app-view is-active" id="view-read" aria-labelledby="nav-read-label">
         <div class="read-layout">
-          <!-- Anchor Context Banner (shown when browsing similar scriptures via Up/Down) -->
-          <div class="anchor-banner" id="anchor-banner" hidden>
-            <div class="anchor-banner-info">
-              <span class="anchor-badge" id="anchor-rank-badge">Similar #1</span>
-              <span class="anchor-text">
-                Closest to <strong id="anchor-ref-text">1 Nephi 12:4</strong>
-                <span class="anchor-dist" id="anchor-dist-text">(Δ 0.08)</span>
-              </span>
-            </div>
-            <div class="anchor-banner-actions">
-              <button type="button" class="pill-btn" id="return-anchor-btn" title="Return to anchor scripture">
-                Return to Anchor
-              </button>
-              <button type="button" class="pill-btn pill-btn-subtle" id="make-anchor-btn" title="Make this verse the new similarity anchor">
-                Set as Anchor
-              </button>
-            </div>
-          </div>
-
-          <!-- Interactive 4-Way Swipe Stage -->
+          <!-- Interactive Swipe Stage -->
           <div class="swipe-stage" id="swipe-stage" aria-live="polite">
             <!-- The Scripture Card -->
-            <article class="scripture-card" id="scripture-card" tabindex="0" aria-label="Current scripture card. Use arrow keys or swipe in 4 directions to navigate.">
+            <article class="scripture-card" id="scripture-card" tabindex="0" aria-label="Current scripture card. Swipe with 1 finger for chronological verses, or 2 fingers for similar verses.">
               <!-- Live Gesture Overlay Badge -->
               <div class="gesture-badge" id="gesture-badge" hidden></div>
 
               <header class="card-header">
                 <div class="card-meta-top">
-                  <span class="volume-pill" id="card-volume">Book of Mormon</span>
-                  <span class="cluster-pill" id="card-cluster" title="t-SNE Cluster &amp; 2D Coordinates">Cluster 99</span>
+                  <span class="volume-pill" id="card-volume">New Testament</span>
+                  <span class="cluster-pill" id="card-cluster" title="t-SNE Cluster &amp; 2D Coordinates">Cluster 75</span>
                 </div>
 
                 <div class="card-title-row">
-                  <h2 class="card-reference" id="card-reference">1 Nephi 12:4</h2>
+                  <h2 class="card-reference" id="card-reference">John 3:16</h2>
                   <button
                     type="button"
                     class="card-picker-trigger"
@@ -111,13 +44,17 @@
 
                 <div class="card-similarity-bar" id="card-similarity-bar">
                   <span class="sim-indicator-dot"></span>
-                  <span id="card-similarity-status">Anchor Scripture • Swipe ↑/↓ for closest by t-SNE</span>
+                  <span class="sim-status-text" id="card-similarity-status">Anchor • 2-finger swipe ↔ for similar</span>
+                  <div class="sim-inline-actions" id="anchor-inline-actions" hidden>
+                    <button type="button" class="inline-chip-btn" id="return-anchor-btn" title="Return to anchor scripture">↩ Anchor</button>
+                    <button type="button" class="inline-chip-btn" id="make-anchor-btn" title="Make this verse the new similarity anchor">Pin</button>
+                  </div>
                 </div>
               </header>
 
               <div class="card-body" id="card-body">
                 <p class="scripture-text" id="card-text">
-                  Loading scripture text…
+                  For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.
                 </p>
               </div>
 
@@ -130,7 +67,7 @@
                     Top 50 Similar →
                   </button>
                   <button type="button" class="text-action-btn" id="card-view-map-btn">
-                    View on 2D Map →
+                    2D Map →
                   </button>
                 </div>
               </footer>
@@ -138,25 +75,25 @@
           </div>
 
           <!-- 4-Way Navigation Compass / Controls Bar -->
-          <div class="compass-controls" role="group" aria-label="Four-way scripture navigation controls">
-            <button type="button" class="compass-btn compass-left" id="btn-swipe-left" title="Previous chronological verse (Left Arrow or Swipe Left)">
+          <div class="compass-controls" role="group" aria-label="Scripture navigation controls">
+            <button type="button" class="compass-btn compass-left" id="btn-swipe-left" title="Previous chronological verse">
               <span class="compass-arrow" aria-hidden="true">←</span>
               <span class="compass-text">
                 <span class="compass-type">Prev Verse</span>
-                <strong class="compass-ref" id="btn-left-ref">1 Ne. 12:3</strong>
+                <strong class="compass-ref" id="btn-left-ref">John 3:15</strong>
               </span>
             </button>
 
             <div class="compass-vertical-group">
-              <button type="button" class="compass-btn compass-up" id="btn-swipe-up" title="Next closest verse by t-SNE distance (Up Arrow or Swipe Up)">
+              <button type="button" class="compass-btn compass-up" id="btn-swipe-up" title="Next closest verse by t-SNE distance (2-finger swipe or Up Arrow)">
                 <span class="compass-arrow" aria-hidden="true">↑</span>
                 <span class="compass-text">
                   <span class="compass-type" id="btn-up-type">Closest #1 (t-SNE)</span>
-                  <strong class="compass-ref" id="btn-up-ref">1 Sam. 14:15</strong>
+                  <strong class="compass-ref" id="btn-up-ref">—</strong>
                 </span>
               </button>
 
-              <button type="button" class="compass-btn compass-down" id="btn-swipe-down" title="Previous in t-SNE similarity list (Down Arrow or Swipe Down)">
+              <button type="button" class="compass-btn compass-down" id="btn-swipe-down" title="Previous in t-SNE similarity list (2-finger swipe or Down Arrow)">
                 <span class="compass-arrow" aria-hidden="true">↓</span>
                 <span class="compass-text">
                   <span class="compass-type" id="btn-down-type">Closest #50 (t-SNE)</span>
@@ -165,10 +102,10 @@
               </button>
             </div>
 
-            <button type="button" class="compass-btn compass-right" id="btn-swipe-right" title="Next chronological verse (Right Arrow or Swipe Right)">
+            <button type="button" class="compass-btn compass-right" id="btn-swipe-right" title="Next chronological verse">
               <span class="compass-text compass-text-right">
                 <span class="compass-type">Next Verse</span>
-                <strong class="compass-ref" id="btn-right-ref">1 Ne. 12:5</strong>
+                <strong class="compass-ref" id="btn-right-ref">John 3:17</strong>
               </span>
               <span class="compass-arrow" aria-hidden="true">→</span>
             </button>
@@ -209,8 +146,8 @@
           <div class="featured-bar">
             <span class="featured-label">Quick Jump:</span>
             <div class="scroller" role="region" aria-label="Featured scriptures">
-              <button type="button" class="chip-btn" data-jump-ref="1 Nephi 12:4">1 Nephi 12:4</button>
               <button type="button" class="chip-btn" data-jump-ref="John 3:16">John 3:16</button>
+              <button type="button" class="chip-btn" data-jump-ref="1 Nephi 12:4">1 Nephi 12:4</button>
               <button type="button" class="chip-btn" data-jump-ref="Genesis 1:1">Genesis 1:1</button>
               <button type="button" class="chip-btn" data-jump-ref="Alma 32:21">Alma 32:21</button>
               <button type="button" class="chip-btn" data-jump-ref="Moroni 10:4">Moroni 10:4</button>
@@ -239,7 +176,7 @@
             <!-- Preview of Selected Verse in Picker (Placed at top of picker for immediate visibility & action) -->
             <div class="picker-preview-card">
               <div class="picker-preview-info">
-                <strong id="picker-preview-ref">1 Nephi 12:4</strong>
+                <strong id="picker-preview-ref">John 3:16</strong>
                 <p id="picker-preview-text">Select a book, chapter, and verse below.</p>
               </div>
               <button type="button" class="primary-btn" id="picker-go-btn">
@@ -281,7 +218,7 @@
               <div>
                 <h2>Top 50 Similar Scriptures</h2>
                 <p class="view-subtitle">
-                  Ranked by 2D t-SNE Euclidean distance from anchor <strong id="similar-anchor-title">1 Nephi 12:4</strong>.
+                  Ranked by 2D t-SNE Euclidean distance from anchor <strong id="similar-anchor-title">John 3:16</strong>.
                 </p>
               </div>
               <label class="filter-toggle-label">
@@ -306,6 +243,23 @@
               </p>
             </div>
             <div class="map-controls-bar">
+              <button
+                type="button"
+                class="pill-btn icon-pill-btn"
+                id="random-verse-header-btn"
+                title="Pick a random scripture"
+                aria-label="Pick a random scripture"
+              >
+                <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="3"></rect>
+                  <circle cx="8.5" cy="8.5" r="1.25" fill="currentColor"></circle>
+                  <circle cx="15.5" cy="8.5" r="1.25" fill="currentColor"></circle>
+                  <circle cx="12" cy="12" r="1.25" fill="currentColor"></circle>
+                  <circle cx="8.5" cy="15.5" r="1.25" fill="currentColor"></circle>
+                  <circle cx="15.5" cy="15.5" r="1.25" fill="currentColor"></circle>
+                </svg>
+                <span>Random</span>
+              </button>
               <button type="button" class="pill-btn" id="map-focus-neighborhood-btn">Zoom to Top 50</button>
               <button type="button" class="pill-btn" id="map-reset-zoom-btn">Full Map</button>
               <select id="map-color-mode" class="compact-select" aria-label="Color points by">
@@ -323,7 +277,7 @@
             <div class="map-inspector" id="map-inspector">
               <div class="map-inspector-info">
                 <span class="map-inspector-badge" id="map-inspector-badge">Current</span>
-                <strong id="map-inspector-ref">1 Nephi 12:4</strong>
+                <strong id="map-inspector-ref">John 3:16</strong>
                 <span class="map-inspector-coords" id="map-inspector-coords">(x: 0, y: 0)</span>
                 <p class="map-inspector-text" id="map-inspector-text"></p>
               </div>
@@ -350,16 +304,42 @@
       <section class="app-view" id="view-about" aria-labelledby="nav-about-label" hidden>
         <div class="view-container about-container">
           <div class="about-card">
-            <h2>About Verses</h2>
+            <div class="about-brand-bar">
+              <div class="header-brand">
+                <span class="brand-logo" aria-hidden="true">✦</span>
+                <div class="brand-titles">
+                  <h2 class="brand-title">verses</h2>
+                  <span class="brand-subtitle" id="header-status">41,995 scriptures • t-SNE 2D</span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                class="icon-btn"
+                id="shortcuts-btn"
+                command="show-modal"
+                commandfor="shortcuts-dialog"
+                title="Swipe &amp; Keyboard Guide"
+                aria-label="Swipe and Keyboard Guide"
+              >
+                <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <span>How to Navigate (?)</span>
+              </button>
+            </div>
+
             <p>
               This interactive web app lets you explore over <strong>41,995 verses of scripture</strong> (Old Testament, New Testament, Book of Mormon, Doctrine and Covenants, and Pearl of Great Price) both chronologically and semantically:
             </p>
             <ul class="about-feature-list">
               <li>
-                <strong>Swipe Right / Left (Chronological):</strong> Move sequentially to the next or previous scripture verse (for example, from <em>1 Nephi 12:4</em>, swiping right yields <em>1 Nephi 12:5</em> and swiping left yields <em>1 Nephi 12:3</em>).
+                <strong>1-Finger Swipe Left / Right (Chronological):</strong> Flip sequentially to the next or previous scripture verse (in default <em>Page Flip</em> mode, swiping left goes to the next verse like <em>John 3:16 → John 3:17</em>, and swiping right goes to <em>John 3:15</em>).
               </li>
               <li>
-                <strong>Swipe Up / Down (t-SNE Similarity):</strong> Step through the scriptures that are closest in meaning based on Euclidean distance in the 2D t-SNE embedding space.
+                <strong>2-Finger Swipe Left / Right (t-SNE Similarity):</strong> Swipe horizontally with two fingers (or tap the <strong>↑ / ↓</strong> buttons) to step through the 50 scriptures that are closest in meaning based on Euclidean distance in the 2D t-SNE embedding space.
               </li>
             </ul>
 
@@ -386,11 +366,11 @@
               <div class="setting-row">
                 <div>
                   <strong>Horizontal Swipe Direction</strong>
-                  <p class="setting-desc">Choose how left/right swipes map to chronological verses.</p>
+                  <p class="setting-desc">Choose how left/right swipes map to next/previous verses.</p>
                 </div>
                 <select id="setting-swipe-mode" class="compact-select">
-                  <option value="direct">Swipe Right = Next (+1), Left = Prev (-1)</option>
-                  <option value="natural">Page Flip: Swipe Left = Next (+1), Right = Prev (-1)</option>
+                  <option value="natural" selected>Page Flip: Swipe Left = Next (+1), Right = Prev (-1)</option>
+                  <option value="direct">Direct: Swipe Right = Next (+1), Left = Prev (-1)</option>
                 </select>
               </div>
 
@@ -489,31 +469,31 @@
       <div class="dialog-body">
         <div class="guide-grid">
           <div class="guide-item">
-            <span class="guide-icon">👉</span>
-            <div>
-              <strong>Swipe Right (or <kbd>→</kbd>)</strong>
-              <p>Go to the <strong>next chronological scripture</strong> (e.g. <em>1 Nephi 12:4 → 1 Nephi 12:5</em>).</p>
-            </div>
-          </div>
-          <div class="guide-item">
             <span class="guide-icon">👈</span>
             <div>
-              <strong>Swipe Left (or <kbd>←</kbd>)</strong>
-              <p>Go to the <strong>previous chronological scripture</strong> (e.g. <em>1 Nephi 12:4 → 1 Nephi 12:3</em>).</p>
+              <strong>1-Finger Swipe Left (or <kbd>→</kbd>)</strong>
+              <p>Go to the <strong>next chronological scripture</strong> in default Page Flip mode (e.g. <em>John 3:16 → John 3:17</em>).</p>
             </div>
           </div>
           <div class="guide-item">
-            <span class="guide-icon">👆</span>
+            <span class="guide-icon">👉</span>
             <div>
-              <strong>Swipe Up (or <kbd>↑</kbd>)</strong>
-              <p>Step forward to the <strong>next closest scripture by t-SNE distance</strong> (#1 closest, #2 closest, etc.).</p>
+              <strong>1-Finger Swipe Right (or <kbd>←</kbd>)</strong>
+              <p>Go to the <strong>previous chronological scripture</strong> in default Page Flip mode (e.g. <em>John 3:16 → John 3:15</em>).</p>
             </div>
           </div>
           <div class="guide-item">
-            <span class="guide-icon">👇</span>
+            <span class="guide-icon">✌️</span>
             <div>
-              <strong>Swipe Down (or <kbd>↓</kbd>)</strong>
-              <p>Step back up the similarity list toward your anchor scripture (or jump into #1 closest when on the anchor).</p>
+              <strong>2-Finger Swipe Left / Right (or <kbd>↑</kbd> / <kbd>↓</kbd>)</strong>
+              <p>Swipe horizontally with <strong>two fingers</strong> (or tap the <strong>↑ / ↓</strong> buttons) to step through the <strong>50 closest scriptures by t-SNE distance</strong> (#1 closest, #2 closest, … #50).</p>
+            </div>
+          </div>
+          <div class="guide-item">
+            <span class="guide-icon">📜</span>
+            <div>
+              <strong>Long Verses &amp; Bottom Buttons</strong>
+              <p>Scroll long verses vertically with 1 finger, or tap <strong>← Prev Verse</strong> (left), <strong>↑ / ↓ Closest</strong> (middle), and <strong>Next Verse →</strong> (right) below the card.</p>
             </div>
           </div>
         </div>

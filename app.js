@@ -34,28 +34,28 @@
     refMap: new Map(),   // normalized ref string -> verse index
 
     // Navigation state
-    anchorIndex: 31370,  // Default: 1 Nephi 12:4
+    anchorIndex: 26136,  // Default: John 3:16
     top50: [],           // Array of { index, distance, rank } for current anchorIndex
-    simRank: 0,          // 0 = Anchor verse itself, 1..49 = closest neighbors by t-SNE distance
+    simRank: 0,          // 0 = Anchor verse itself, 1..50 = closest neighbors by t-SNE distance
     activeView: 'read',  // 'read' | 'select' | 'similar' | 'map' | 'about'
 
     // Picker state
     pickerVolume: 'all',
-    pickerBook: '1 Nephi',
-    pickerChapter: 12,
-    pickerVerse: 4,
+    pickerBook: 'John',
+    pickerChapter: 3,
+    pickerVerse: 16,
 
     // Map state
     mapTransform: { x: 0, y: 0, k: 1 },
-    mapInspectedIndex: 31370,
+    mapInspectedIndex: 26136,
     mapColorMode: 'highlight',
     xMin: 0,
     xMax: 140,
     yMin: 0,
     yMax: 120,
 
-    // Preferences
-    swipeMode: localStorage.getItem('verses_swipe_mode') || 'direct', // 'direct' (Right=+1) | 'natural' (Left=+1)
+    // Preferences (default swipeMode is 'natural' / Page Flip: Swipe Left = Next Verse)
+    swipeMode: localStorage.getItem('verses_swipe_mode_v2') || 'natural', // 'natural' (Left=+1) | 'direct' (Right=+1)
     fontSize: localStorage.getItem('verses_font_size') || 'md',
     theme: localStorage.getItem('verses_theme') || 'auto'
   };
@@ -78,10 +78,7 @@
     navButtons: Array.from(document.querySelectorAll('.bottom-nav-item')),
 
     // Read / Swipe View
-    anchorBanner: document.getElementById('anchor-banner'),
-    anchorRankBadge: document.getElementById('anchor-rank-badge'),
-    anchorRefText: document.getElementById('anchor-ref-text'),
-    anchorDistText: document.getElementById('anchor-dist-text'),
+    anchorInlineActions: document.getElementById('anchor-inline-actions'),
     returnAnchorBtn: document.getElementById('return-anchor-btn'),
     makeAnchorBtn: document.getElementById('make-anchor-btn'),
 
@@ -331,8 +328,8 @@
 
       els.headerStatus.textContent = `${count.toLocaleString()} scriptures • t-SNE 2D`;
 
-      // Check initial URL hash or default to 1 Nephi 12:4
-      const initialIndex = resolveHashToIndex() ?? state.refMap.get('1 nephi 12:4') ?? 0;
+      // Check initial URL hash or default to John 3:16
+      const initialIndex = resolveHashToIndex() ?? state.refMap.get('john 3:16') ?? 0;
       setAnchorVerse(initialIndex, null);
       populatePickerData();
     } catch (err) {
@@ -421,7 +418,7 @@
   }
 
   /**
-   * Moves along the current Anchor's t-SNE similarity list (Swipe Up / Down)
+   * Moves along the current Anchor's t-SNE similarity list
    */
   function setSimilarityRank(newRank, transitionType = null) {
     if (!state.loaded || !state.top50.length) return;
@@ -441,12 +438,10 @@
   }
 
   /**
-   * 4-Way Directional Actions
-   * Matches user request:
-   * - Swipe Right -> Next chronological scripture (e.g. 1 Nephi 12:4 -> 1 Nephi 12:5)
-   * - Swipe Left  -> Previous chronological scripture (e.g. 1 Nephi 12:4 -> 1 Nephi 12:3)
-   * - Swipe Up    -> Next closest scripture per t-SNE distance (rank + 1, wrapping 50 -> 0)
-   * - Swipe Down  -> Previous in similarity list (rank - 1, wrapping 0 (Anchor) -> 50 (#50 closest))
+   * Directional Targets
+   * - Buttons: Left button is ALWAYS Prev Verse (-1), Right button is ALWAYS Next Verse (+1)
+   * - 1-Finger Swipe: In default 'natural' (Page Flip) mode, Swipe Left = Next Verse (+1), Swipe Right = Prev Verse (-1)
+   * - 2-Finger Swipe / Up & Down Buttons: Step through t-SNE similarity ranks (0 <-> 1 <-> ... <-> 50 <-> 0)
    */
   function getDirectionalTargets() {
     const count = state.verses.length;
@@ -454,15 +449,17 @@
     const nextChronIdx = (currIdx + 1) % count;
     const prevChronIdx = (currIdx - 1 + count) % count;
 
-    const rightIdx = state.swipeMode === 'direct' ? nextChronIdx : prevChronIdx;
-    const leftIdx = state.swipeMode === 'direct' ? prevChronIdx : nextChronIdx;
+    const swipeRightIdx = state.swipeMode === 'direct' ? nextChronIdx : prevChronIdx;
+    const swipeLeftIdx = state.swipeMode === 'direct' ? prevChronIdx : nextChronIdx;
 
     const upRank = state.simRank >= 50 ? 0 : state.simRank + 1;
     const downRank = state.simRank === 0 ? 50 : state.simRank - 1;
 
     return {
-      rightVerse: state.verses[rightIdx],
-      leftVerse: state.verses[leftIdx],
+      nextChronVerse: state.verses[nextChronIdx],
+      prevChronVerse: state.verses[prevChronIdx],
+      swipeRightVerse: state.verses[swipeRightIdx],
+      swipeLeftVerse: state.verses[swipeLeftIdx],
       upItem: state.top50[upRank] || state.top50[0],
       downItem: state.top50[downRank] || state.top50[0],
       upRank,
@@ -470,14 +467,24 @@
     };
   }
 
+  function handleNextChron() {
+    const { nextChronVerse } = getDirectionalTargets();
+    if (nextChronVerse) setAnchorVerse(nextChronVerse.index, 'swipe-left');
+  }
+
+  function handlePrevChron() {
+    const { prevChronVerse } = getDirectionalTargets();
+    if (prevChronVerse) setAnchorVerse(prevChronVerse.index, 'swipe-right');
+  }
+
   function handleSwipeRight() {
-    const { rightVerse } = getDirectionalTargets();
-    if (rightVerse) setAnchorVerse(rightVerse.index, 'swipe-right');
+    const { swipeRightVerse } = getDirectionalTargets();
+    if (swipeRightVerse) setAnchorVerse(swipeRightVerse.index, 'swipe-right');
   }
 
   function handleSwipeLeft() {
-    const { leftVerse } = getDirectionalTargets();
-    if (leftVerse) setAnchorVerse(leftVerse.index, 'swipe-left');
+    const { swipeLeftVerse } = getDirectionalTargets();
+    if (swipeLeftVerse) setAnchorVerse(swipeLeftVerse.index, 'swipe-left');
   }
 
   function handleSwipeUp() {
@@ -508,51 +515,52 @@
     els.cardCoords.textContent = `t-SNE: (${curr.x.toFixed(2)}, ${curr.y.toFixed(2)})`;
     els.cardBody.scrollTop = 0;
 
-    // Anchor context banner when browsing similar scriptures
+    // Compact inline similarity status inside card header (no separate top banner)
     if (state.simRank === 0) {
-      els.anchorBanner.hidden = true;
-      els.cardSimilarityStatus.textContent = 'Anchor Scripture • Swipe ↑ or ↓ for closest by t-SNE distance';
+      if (els.anchorInlineActions) els.anchorInlineActions.hidden = true;
+      els.cardSimilarityStatus.textContent = 'Anchor • 2-finger swipe ↔ or tap ↑/↓ for similar';
     } else {
-      els.anchorBanner.hidden = false;
-      els.anchorRankBadge.textContent = `Similar #${state.simRank} of 50`;
-      els.anchorRefText.textContent = anchor.ref;
-      els.anchorDistText.textContent = `(t-SNE Δ ${currentSimItem.distance.toFixed(2)})`;
-      els.cardSimilarityStatus.textContent = `Closest #${state.simRank} to ${anchor.shortRef} (distance ${currentSimItem.distance.toFixed(2)})`;
+      if (els.anchorInlineActions) els.anchorInlineActions.hidden = false;
+      els.cardSimilarityStatus.textContent = `Similar #${state.simRank}/50 to ${anchor.shortRef} (Δ ${currentSimItem.distance.toFixed(2)})`;
     }
 
-    // Update 4-way compass buttons
-    const { rightVerse, leftVerse, upItem, downItem, upRank, downRank } = getDirectionalTargets();
+    // Update 4-way compass buttons: Left is ALWAYS Prev Verse, Right is ALWAYS Next Verse
+    const { nextChronVerse, prevChronVerse, upItem, downItem, upRank, downRank } = getDirectionalTargets();
     const upVerse = state.verses[upItem.index];
     const downVerse = state.verses[downItem.index];
 
-    const leftTypeLabel = state.swipeMode === 'direct' ? 'Prev Verse' : 'Next Verse';
-    const rightTypeLabel = state.swipeMode === 'direct' ? 'Next Verse' : 'Prev Verse';
+    els.btnSwipeLeft.querySelector('.compass-type').textContent = 'Prev Verse';
+    els.btnLeftRef.textContent = prevChronVerse.shortRef;
 
-    els.btnDownType.textContent = downRank === 0 ? 'Back to Anchor' : `Closest #${downRank} (t-SNE)`;
-    els.btnDownRef.textContent = downVerse.shortRef;
-
-    els.btnSwipeLeft.querySelector('.compass-type').textContent = leftTypeLabel;
-    els.btnLeftRef.textContent = leftVerse.shortRef;
-    els.btnSwipeRight.querySelector('.compass-type').textContent = rightTypeLabel;
-    els.btnRightRef.textContent = rightVerse.shortRef;
+    els.btnSwipeRight.querySelector('.compass-type').textContent = 'Next Verse';
+    els.btnRightRef.textContent = nextChronVerse.shortRef;
 
     els.btnUpType.textContent = upRank === 0 ? 'Back to Anchor' : `Closest #${upRank} (t-SNE)`;
     els.btnUpRef.textContent = upVerse.shortRef;
+
+    els.btnDownType.textContent = downRank === 0 ? 'Back to Anchor' : `Closest #${downRank} (t-SNE)`;
+    els.btnDownRef.textContent = downVerse.shortRef;
   }
 
   /* ========================================================================
-     5. INTERACTIVE 4-WAY TOUCH / POINTER SWIPE ENGINE
+     5. INTERACTIVE 1-FINGER & 2-FINGER SWIPE ENGINE
      ======================================================================== */
   function setupSwipeGestures() {
     let startX = 0;
     let startY = 0;
     let currentX = 0;
-    let currentY = 0;
     let isDragging = false;
     let lockedAxis = null; // 'x' | 'y' | null
     let pointerId = null;
 
-    const SWIPE_THRESHOLD = 52;
+    // 2-Finger Touch State (for similar scriptures on mobile)
+    let wasTwoFingerGesture = false;
+    let twoFingerTriggered = false;
+    let twoFingerStartX = 0;
+    let twoFingerLastDx = 0;
+
+    const SWIPE_THRESHOLD = 46;
+    const TWO_FINGER_THRESHOLD = 38;
     const LOCK_THRESHOLD = 10;
 
     function resetCardPosition() {
@@ -561,8 +569,80 @@
       els.gestureBadge.hidden = true;
     }
 
+    // --- A. Two-Finger Horizontal Touch Swipe (Similar Scriptures) ---
+    els.scriptureCard.addEventListener('touchstart', (e) => {
+      if (e.touches.length >= 2) {
+        wasTwoFingerGesture = true;
+        twoFingerTriggered = false;
+        isDragging = false;
+        lockedAxis = null;
+        twoFingerStartX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+        twoFingerLastDx = 0;
+        els.scriptureCard.style.transition = 'none';
+      }
+    }, { passive: true });
+
+    els.scriptureCard.addEventListener('touchmove', (e) => {
+      if (!wasTwoFingerGesture || e.touches.length < 2) return;
+
+      const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+      const dx = midX - twoFingerStartX;
+      twoFingerLastDx = dx;
+
+      if (Math.abs(dx) > 6) {
+        e.preventDefault();
+      }
+
+      const moveX = dx * 0.65;
+      els.scriptureCard.style.transform = `translate3d(${moveX}px, 0, 0)`;
+
+      if (Math.abs(dx) > 16) {
+        const { upItem, downItem, upRank, downRank } = getDirectionalTargets();
+        const isNextSim = state.swipeMode === 'natural' ? dx < 0 : dx > 0;
+        const targetRank = isNextSim ? upRank : downRank;
+        const targetItem = isNextSim ? upItem : downItem;
+        const targetVerse = state.verses[targetItem.index];
+
+        els.gestureBadge.hidden = false;
+        els.gestureBadge.classList.add('is-similarity');
+        els.gestureBadge.textContent = targetRank === 0
+          ? `✌️ Anchor: ${targetVerse.ref}`
+          : `✌️ Closest #${targetRank}: ${targetVerse.ref} (Δ ${targetItem.distance.toFixed(2)})`;
+      } else {
+        els.gestureBadge.hidden = true;
+      }
+    }, { passive: false });
+
+    function handleTwoFingerEnd(e) {
+      if (!wasTwoFingerGesture) return;
+
+      if (!twoFingerTriggered && Math.abs(twoFingerLastDx) >= TWO_FINGER_THRESHOLD) {
+        twoFingerTriggered = true;
+        const dx = twoFingerLastDx;
+        resetCardPosition();
+        const isNextSim = state.swipeMode === 'natural' ? dx < 0 : dx > 0;
+        if (isNextSim) {
+          handleSwipeUp();
+        } else {
+          handleSwipeDown();
+        }
+      } else if (e.touches.length === 0) {
+        resetCardPosition();
+      }
+
+      if (e.touches.length === 0) {
+        wasTwoFingerGesture = false;
+        twoFingerTriggered = false;
+        twoFingerLastDx = 0;
+      }
+    }
+
+    els.scriptureCard.addEventListener('touchend', handleTwoFingerEnd);
+    els.scriptureCard.addEventListener('touchcancel', handleTwoFingerEnd);
+
+    // --- B. Single-Finger / Pointer Horizontal Swipe (Chronological Verses) ---
     els.scriptureCard.addEventListener('pointerdown', (e) => {
-      // Ignore clicks on interactive buttons inside the card
+      if (wasTwoFingerGesture) return;
       if (e.target.closest('button, a')) return;
       if (e.pointerType === 'mouse' && e.button !== 0) return;
 
@@ -571,14 +651,12 @@
       startX = e.clientX;
       startY = e.clientY;
       currentX = 0;
-      currentY = 0;
       pointerId = e.pointerId;
       els.scriptureCard.style.transition = 'none';
-      els.scriptureCard.setPointerCapture(pointerId);
     });
 
     els.scriptureCard.addEventListener('pointermove', (e) => {
-      if (!isDragging || e.pointerId !== pointerId) return;
+      if (wasTwoFingerGesture || !isDragging || e.pointerId !== pointerId) return;
 
       const dx = e.clientX - startX;
       const dy = e.clientY - startY;
@@ -586,44 +664,38 @@
       if (!lockedAxis) {
         if (Math.abs(dx) > LOCK_THRESHOLD || Math.abs(dy) > LOCK_THRESHOLD) {
           lockedAxis = Math.abs(dx) >= Math.abs(dy) ? 'x' : 'y';
+          if (lockedAxis === 'x') {
+            try {
+              els.scriptureCard.setPointerCapture(pointerId);
+            } catch {
+              // Ignore if pointer capture is unavailable
+            }
+          }
         } else {
           return;
         }
       }
 
-      // Apply damped drag movement along locked axis
-      currentX = lockedAxis === 'x' ? dx * 0.65 : dx * 0.12;
-      currentY = lockedAxis === 'y' ? dy * 0.65 : dy * 0.12;
-      const rotateDeg = lockedAxis === 'x' ? currentX * 0.035 : 0;
+      // If dragging vertically with 1 finger, let native pan-y scroll long verses smoothly
+      if (lockedAxis === 'y') {
+        return;
+      }
 
-      els.scriptureCard.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) rotate(${rotateDeg}deg)`;
+      // Apply damped horizontal drag movement
+      currentX = dx * 0.65;
+      const rotateDeg = currentX * 0.025;
+      els.scriptureCard.style.transform = `translate3d(${currentX}px, 0, 0) rotate(${rotateDeg}deg)`;
 
-      // Show directional preview badge
-      const { rightVerse, leftVerse, upItem, downItem, upRank, downRank } = getDirectionalTargets();
-
-      if (lockedAxis === 'x' && Math.abs(dx) > 22) {
+      const { swipeRightVerse, swipeLeftVerse } = getDirectionalTargets();
+      if (Math.abs(dx) > 20) {
         els.gestureBadge.hidden = false;
         els.gestureBadge.classList.remove('is-similarity');
         if (dx > 0) {
           const actionWord = state.swipeMode === 'direct' ? 'Next Verse' : 'Prev Verse';
-          els.gestureBadge.textContent = `${actionWord}: ${rightVerse.ref} →`;
+          els.gestureBadge.textContent = `${actionWord}: ${swipeRightVerse.ref} →`;
         } else {
           const actionWord = state.swipeMode === 'direct' ? 'Prev Verse' : 'Next Verse';
-          els.gestureBadge.textContent = `← ${actionWord}: ${leftVerse.ref}`;
-        }
-      } else if (lockedAxis === 'y' && Math.abs(dy) > 22) {
-        els.gestureBadge.hidden = false;
-        els.gestureBadge.classList.add('is-similarity');
-        if (dy < 0) {
-          const upV = state.verses[upItem.index];
-          els.gestureBadge.textContent = upRank === 0
-            ? `↑ Anchor: ${upV.ref}`
-            : `↑ Closest #${upRank}: ${upV.ref} (Δ ${upItem.distance.toFixed(2)})`;
-        } else {
-          const downV = state.verses[downItem.index];
-          els.gestureBadge.textContent = downRank === 0
-            ? `↓ Anchor: ${downV.ref}`
-            : `↓ Closest #${downRank}: ${downV.ref} (Δ ${downItem.distance.toFixed(2)})`;
+          els.gestureBadge.textContent = `← ${actionWord}: ${swipeLeftVerse.ref}`;
         }
       } else {
         els.gestureBadge.hidden = true;
@@ -631,6 +703,12 @@
     });
 
     function endGesture(e) {
+      if (wasTwoFingerGesture) {
+        isDragging = false;
+        lockedAxis = null;
+        pointerId = null;
+        return;
+      }
       if (!isDragging || (e && e.pointerId !== pointerId)) return;
       isDragging = false;
       try {
@@ -642,8 +720,6 @@
       }
 
       const dx = e.clientX - startX;
-      const dy = e.clientY - startY;
-
       resetCardPosition();
 
       if (lockedAxis === 'x' && Math.abs(dx) >= SWIPE_THRESHOLD) {
@@ -651,12 +727,6 @@
           handleSwipeRight();
         } else {
           handleSwipeLeft();
-        }
-      } else if (lockedAxis === 'y' && Math.abs(dy) >= SWIPE_THRESHOLD) {
-        if (dy < 0) {
-          handleSwipeUp();
-        } else {
-          handleSwipeDown();
         }
       }
       lockedAxis = null;
@@ -666,13 +736,13 @@
     els.scriptureCard.addEventListener('pointerup', endGesture);
     els.scriptureCard.addEventListener('pointercancel', endGesture);
 
-    // Compass buttons
-    els.btnSwipeLeft.addEventListener('click', handleSwipeLeft);
-    els.btnSwipeRight.addEventListener('click', handleSwipeRight);
+    // Compass buttons: Left button is ALWAYS Prev Verse, Right button is ALWAYS Next Verse
+    els.btnSwipeLeft.addEventListener('click', handlePrevChron);
+    els.btnSwipeRight.addEventListener('click', handleNextChron);
     els.btnSwipeUp.addEventListener('click', handleSwipeUp);
     els.btnSwipeDown.addEventListener('click', handleSwipeDown);
 
-    // Anchor banner buttons
+    // Inline anchor action buttons inside card header
     els.returnAnchorBtn.addEventListener('click', () => setSimilarityRank(0, 'swipe-down'));
     els.makeAnchorBtn.addEventListener('click', () => {
       const currIdx = getCurrentVerseIndex();
@@ -687,10 +757,10 @@
 
       if (e.key === 'ArrowRight') {
         e.preventDefault();
-        handleSwipeRight();
+        handleNextChron();
       } else if (e.key === 'ArrowLeft') {
         e.preventDefault();
-        handleSwipeLeft();
+        handlePrevChron();
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
         handleSwipeUp();
@@ -1466,7 +1536,7 @@
 
     els.settingSwipeMode.addEventListener('change', () => {
       state.swipeMode = els.settingSwipeMode.value;
-      localStorage.setItem('verses_swipe_mode', state.swipeMode);
+      localStorage.setItem('verses_swipe_mode_v2', state.swipeMode);
       renderReadView();
     });
 
@@ -1509,12 +1579,11 @@
     // Filter toggle in Similar view
     els.excludeSameBookToggle.addEventListener('change', renderSimilarView);
 
-    // Random verse button
+    // Random verse button (on 2D Map view)
     els.randomHeaderBtn.addEventListener('click', () => {
       if (!state.loaded) return;
       const randIdx = Math.floor(Math.random() * state.verses.length);
-      setAnchorVerse(randIdx, 'swipe-right');
-      if (state.activeView !== 'read') switchView('read');
+      setAnchorVerse(randIdx, null);
     });
 
     loadScriptures();
