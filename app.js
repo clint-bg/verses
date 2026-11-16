@@ -640,7 +640,10 @@
     els.scriptureCard.addEventListener('touchend', handleTwoFingerEnd);
     els.scriptureCard.addEventListener('touchcancel', handleTwoFingerEnd);
 
-    // --- B. Single-Finger / Pointer Horizontal Swipe (Chronological Verses) ---
+    // --- B. Single-Finger / Pointer Horizontal Swipe & Vertical Scroll ---
+    let startScrollTop = 0;
+    let startedInsideBody = false;
+
     els.scriptureCard.addEventListener('pointerdown', (e) => {
       if (wasTwoFingerGesture) return;
       if (e.target.closest('button, a')) return;
@@ -651,6 +654,8 @@
       startX = e.clientX;
       startY = e.clientY;
       currentX = 0;
+      startScrollTop = els.cardBody.scrollTop;
+      startedInsideBody = Boolean(e.target.closest('#card-body'));
       pointerId = e.pointerId;
       els.scriptureCard.style.transition = 'none';
     });
@@ -663,8 +668,9 @@
 
       if (!lockedAxis) {
         if (Math.abs(dx) > LOCK_THRESHOLD || Math.abs(dy) > LOCK_THRESHOLD) {
-          lockedAxis = Math.abs(dx) >= Math.abs(dy) ? 'x' : 'y';
-          if (lockedAxis === 'x') {
+          // Favor vertical scrolling unless gesture is clearly horizontal
+          lockedAxis = Math.abs(dx) > Math.abs(dy) * 1.35 ? 'x' : 'y';
+          if (lockedAxis === 'x' && e.pointerType === 'mouse') {
             try {
               els.scriptureCard.setPointerCapture(pointerId);
             } catch {
@@ -676,8 +682,13 @@
         }
       }
 
-      // If dragging vertically with 1 finger, let native pan-y scroll long verses smoothly
+      // If dragging vertically with 1 finger or mouse:
+      // - Native pan-y handles touch scrolling inside #card-body
+      // - Mouse drag or touch drag started outside #card-body scrolls #card-body directly
       if (lockedAxis === 'y') {
+        if (e.pointerType === 'mouse' || !startedInsideBody) {
+          els.cardBody.scrollTop = startScrollTop - dy;
+        }
         return;
       }
 
