@@ -506,6 +506,32 @@ a:hover {
   gap: 0.5rem;
 }
 
+.card-meta-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  min-inline-size: 0;
+}
+
+.story-progress-pill {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--sim-accent);
+  background-color: var(--sim-accent-soft);
+  border: 1px solid var(--sim-accent);
+  padding: 0.14rem 0.55rem;
+  border-radius: 999px;
+  max-inline-size: 16rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.story-progress-pill[hidden] {
+  display: none !important;
+}
+
 .volume-pill {
   font-size: 0.72rem;
   font-weight: 700;
@@ -763,17 +789,19 @@ a:hover {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.2rem;
+  gap: 0.18rem;
   border: none;
   background: transparent;
   color: var(--text-secondary);
-  padding: 0.35rem 0.25rem;
+  padding: 0.3rem 0.15rem;
   border-radius: 0.5rem;
+  min-inline-size: 0;
 }
 
 .bottom-nav-label {
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 /* MANDATORY: Indicate active navigation item with both color AND shape (WCAG 1.4.1) */
@@ -791,7 +819,7 @@ a:hover {
 }
 
 /* ==========================================================================
-   8. SECONDARY VIEWS (SELECT, SIMILAR, 2D MAP, ABOUT)
+   8. SECONDARY VIEWS (STORIES, SELECT, SIMILAR, 2D MAP, ABOUT)
    ========================================================================== */
 .view-container {
   max-inline-size: 62rem;
@@ -880,7 +908,9 @@ a:hover {
   gap: 0.4rem;
 }
 
-.vol-filter-btn {
+.vol-filter-btn,
+.story-theme-btn,
+.story-vol-btn {
   padding: 0.32rem 0.7rem;
   border-radius: 999px;
   border: 1px solid var(--border-color);
@@ -889,10 +919,83 @@ a:hover {
   font-weight: 600;
 }
 
-.vol-filter-btn.is-selected {
+.vol-filter-btn.is-selected,
+.story-theme-btn.is-selected,
+.story-vol-btn.is-selected {
   background-color: var(--accent);
   color: #ffffff;
   border-color: var(--accent);
+}
+
+/* Scrolling Stories List on Select Page */
+.stories-scroll-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-block-size: 16.5rem;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-inline-end: 0.3rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+.stories-scroll-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.stories-scroll-list::-webkit-scrollbar-thumb {
+  background-color: var(--border-strong);
+  border-radius: 999px;
+}
+
+.story-list-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: 0.7rem;
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  text-align: left;
+  transition: border-color 140ms ease, background-color 140ms ease;
+}
+
+.story-list-card:hover {
+  border-color: var(--accent);
+}
+
+.story-list-card.is-story-result {
+  background-color: var(--bg-surface);
+  border-inline-start: 3px solid #d97706;
+}
+
+.story-badge-pill {
+  padding: 0.14rem 0.5rem;
+  border-radius: 999px;
+  background-color: rgb(217 119 6 / 0.14);
+  color: #b45309;
+  font-weight: 700;
+  font-size: 0.72rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .story-badge-pill {
+    color: #fbbf24;
+    background-color: rgb(245 158 11 / 0.18);
+  }
+}
+
+:root[data-theme="dark"] .story-badge-pill {
+  color: #fbbf24;
+  background-color: rgb(245 158 11 / 0.18);
+}
+
+.story-summary-text {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
 }
 
 .picker-grid {

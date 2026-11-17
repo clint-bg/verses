@@ -32,6 +32,7 @@
     books: [],           // Array of { name, volume, chapters: Map<number, Array<verseObj>> }
     bookMap: new Map(),  // bookName -> bookObj
     refMap: new Map(),   // normalized ref string -> verse index
+    stories: [],         // Array of { title, shortTitle, summary, startRef, turningRef, endRef, startIdx, turningIdx, endIdx, volume }
 
     // Navigation state
     anchorIndex: 26136,  // Default: John 3:16
@@ -48,6 +49,7 @@
     // Map state
     mapTransform: { x: 0, y: 0, k: 1 },
     mapInspectedIndex: 26136,
+    mapHoveredStory: null,
     mapColorMode: 'highlight',
     xMin: 0,
     xMax: 140,
@@ -86,6 +88,7 @@
     scriptureCard: document.getElementById('scripture-card'),
     gestureBadge: document.getElementById('gesture-badge'),
     cardVolume: document.getElementById('card-volume'),
+    cardStoryBadge: document.getElementById('card-story-badge'),
     cardCluster: document.getElementById('card-cluster'),
     cardReference: document.getElementById('card-reference'),
     cardChangeRefBtn: document.getElementById('card-change-ref-btn'),
@@ -125,6 +128,8 @@
     searchSubmitBtn: document.getElementById('search-submit-btn'),
     searchMeta: document.getElementById('search-meta'),
     searchResultsList: document.getElementById('search-results-list'),
+    storiesListMeta: document.getElementById('stories-list-meta'),
+    storiesScrollList: document.getElementById('stories-scroll-list'),
 
     // Similar View
     similarAnchorTitle: document.getElementById('similar-anchor-title'),
@@ -218,6 +223,91 @@
       if (row.length > 1) rows.push(row);
     }
     return rows;
+  }
+
+  function resolveRefString(rawRef) {
+    if (!rawRef) return undefined;
+    let norm = String(rawRef).trim().replace(/\s+/g, ' ').toLowerCase();
+    if (state.refMap.has(norm)) return state.refMap.get(norm);
+
+    // Handle common book name shorthand in case user adds custom rows to scripture_stories.csv
+    norm = norm
+      .replace(/^d&c\s+/, 'doctrine and covenants ')
+      .replace(/^psalm\s+/, 'psalms ')
+      .replace(/^js[—–-]?h(?:istory)?\s+/, 'joseph smith--history ')
+      .replace(/^song of solomon\s+/, 'song ofuet ') // fallback check
+      .trim();
+    return state.refMap.get(norm);
+  }
+
+  function abbreviateStoryTitle(title, maxLen = 28) {
+    const clean = String(title || '').trim();
+    if (clean.length <= maxLen) return clean;
+    const cut = clean.slice(0, maxLen);
+    const lastSpace = cut.lastIndexOf(' ');
+    return `${lastSpace > 12 ? cut.slice(0, lastSpace) : cut}…`;
+  }
+
+  async function loadStoriesCSV() {
+    try {
+      const response = await fetch('data/scripture_stories.csv', { cache: 'no-cache' });
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status} loading data/scripture_stories.csv`);
+      }
+      const csvText = await response.text();
+      const rawRows = parseCSV(csvText);
+      if (rawRows.length <= 1) return;
+
+      // Header: story_title,story_summary,starting_verse,turning_point_verse,ending_verse
+      const dataRows = rawRows.slice(1);
+      const stories = [];
+
+      for (let i = 0; i < dataRows.length; i++) {
+        const r = dataRows[i];
+        if (!r || r.length < 3) continue;
+        const title = (r[0] || '').trim();
+        const summary = (r[1] || '').trim();
+        const startRef = (r[2] || '').trim();
+        const turningRef = (r[3] || startRef).trim();
+        const endRef = (r[4] || turningRef || startRef).trim();
+        if (!title || !startRef) continue;
+
+        const rawStartIdx = resolveRefString(startRef);
+        const rawTurningIdx = resolveRefString(turningRef) ?? rawStartIdx;
+        const rawEndIdx = resolveRefString(endRef) ?? rawTurningIdx ?? rawStartIdx;
+
+        if (rawStartIdx === undefined) continue;
+
+        const startIdx = Math.min(rawStartIdx, rawEndIdx);
+        const endIdx = Math.max(rawStartIdx, rawEndIdx);
+        const turningIdx = rawTurningIdx ?? startIdx;
+        const volume = state.verses[startIdx]?.volume || '';
+
+        stories.push({
+          id: `story-${i}`,
+          title,
+          shortTitle: abbreviateStoryTitle(title, 30),
+          summary,
+          startRef: state.verses[startIdx]?.ref || startRef,
+          turningRef: state.verses[turningIdx]?.ref || turningRef,
+          endRef: state.verses[endIdx]?.ref || endRef,
+          startIdx,
+          turningIdx,
+          endIdx,
+          volume
+        });
+      }
+
+      state.stories = stories;
+      renderStoriesScrollList();
+      renderReadView();
+      if (state.activeView === 'map') renderMap();
+    } catch (err) {
+      console.error('Error loading data/scripture_stories.csv:', err);
+      if (els.storiesListMeta) {
+        els.storiesListMeta.textContent = 'Could not load data/scripture_stories.csv';
+      }
+    }
   }
 
   async function loadScriptures() {
@@ -332,6 +422,7 @@
       const initialIndex = resolveHashToIndex() ?? state.refMap.get('john 3:16') ?? 0;
       setAnchorVerse(initialIndex, null);
       populatePickerData();
+      await loadStoriesCSV();
     } catch (err) {
       console.error(err);
       els.headerStatus.textContent = 'Error loading scripture dataset';
@@ -514,6 +605,22 @@
     els.cardText.textContent = curr.text;
     els.cardCoords.textContent = `t-SNE: (${curr.x.toFixed(2)}, ${curr.y.toFixed(2)})`;
     els.cardBody.scrollTop = 0;
+
+    // Story label (abbreviated Story Title) when current verse is part of a story
+    if (els.cardStoryBadge) {
+      const activeStory = state.stories.find(
+        (s) => s.startIdx !== undefined && s.endIdx !== undefined && currIdx >= s.startIdx && currIdx <= s.endIdx
+      );
+      if (activeStory) {
+        els.cardStoryBadge.hidden = false;
+        els.cardStoryBadge.textContent = `📖 ${activeStory.shortTitle}`;
+        els.cardStoryBadge.title = `${activeStory.title} (${activeStory.startRef} – ${activeStory.endRef})`;
+        els.cardStoryBadge.dataset.storyStartIdx = String(activeStory.startIdx);
+      } else {
+        els.cardStoryBadge.hidden = true;
+        delete els.cardStoryBadge.dataset.storyStartIdx;
+      }
+    }
 
     // Compact inline similarity status inside card header (no separate top banner)
     if (state.simRank === 0) {
@@ -794,7 +901,7 @@
     }
 
     if (!q) {
-      els.searchMeta.textContent = 'Start typing to search all 41,995 verses instantly, or press Enter to jump to a matching reference.';
+      els.searchMeta.textContent = 'Start typing to search all 41,995 verses and story summaries instantly, or press Enter to jump to a match.';
       els.searchResultsList.innerHTML = '';
       return;
     }
@@ -813,12 +920,39 @@
       return;
     }
 
+    const terms = lowerQ.split(/\s+/).filter(Boolean);
+
+    // 1. Search Scripture Stories (matching story_summary, story_title, or story verse references)
+    const storyMatches = [];
+    for (let i = 0; i < state.stories.length; i++) {
+      const s = state.stories[i];
+      if (s.startIdx === undefined) continue;
+      const haySummary = s.summary.toLowerCase();
+      const hayTitle = s.title.toLowerCase();
+      const hayRefs = `${s.startRef} ${s.turningRef} ${s.endRef}`.toLowerCase();
+      let ok = true;
+      for (let t = 0; t < terms.length; t++) {
+        const term = terms[t];
+        if (!haySummary.includes(term) && !hayTitle.includes(term) && !hayRefs.includes(term)) {
+          ok = false;
+          break;
+        }
+      }
+      if (ok) storyMatches.push(s);
+    }
+
+    if (jumpOnExactMatch && storyMatches.length > 0 && exactIdx === undefined) {
+      setAnchorVerse(storyMatches[0].startIdx, null);
+      switchView('read');
+      return;
+    }
+
+    // 2. Search individual Scripture Verses
     const matches = [];
     if (exactIdx !== undefined) {
       matches.push(state.verses[exactIdx]);
     }
 
-    const terms = lowerQ.split(/\s+/).filter(Boolean);
     const allVerses = state.verses;
     const maxResults = 60;
 
@@ -839,12 +973,40 @@
       if (ok) matches.push(v);
     }
 
-    els.searchMeta.textContent = matches.length >= maxResults
-      ? `Showing top ${maxResults} matches for "${q}" — click any verse to open it`
-      : `Found ${matches.length} ${matches.length === 1 ? 'verse' : 'verses'} matching "${q}"`;
+    const storySummaryPart = storyMatches.length > 0
+      ? `${storyMatches.length} ${storyMatches.length === 1 ? 'story' : 'stories'} & `
+      : '';
+    const verseSummaryPart = matches.length >= maxResults
+      ? `top ${maxResults} verses`
+      : `${matches.length} ${matches.length === 1 ? 'verse' : 'verses'}`;
+    els.searchMeta.textContent = `Found ${storySummaryPart}${verseSummaryPart} matching "${q}" — click any result to open it`;
 
     els.searchResultsList.innerHTML = '';
     const frag = document.createDocumentFragment();
+
+    // Render matching Story results first (returning the Story Title as primary value)
+    storyMatches.forEach((s) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'verse-list-card story-list-card';
+      btn.innerHTML = `
+        <div class="verse-list-header">
+          <span class="verse-list-title">${s.title}</span>
+          <div class="verse-list-badges">
+            <span class="story-badge-pill">📖 Story • ${s.startRef} – ${s.endRef}</span>
+            <span class="volume-pill">${s.volume}</span>
+          </div>
+        </div>
+        <p class="verse-list-text story-summary-text">${s.summary}</p>
+      `;
+      btn.addEventListener('click', () => {
+        setAnchorVerse(s.startIdx, null);
+        switchView('read');
+      });
+      frag.appendChild(btn);
+    });
+
+    // Render matching Verse results
     matches.forEach((v) => {
       const btn = document.createElement('button');
       btn.type = 'button';
@@ -866,6 +1028,47 @@
       frag.appendChild(btn);
     });
     els.searchResultsList.appendChild(frag);
+  }
+
+  function renderStoriesScrollList() {
+    if (!els.storiesScrollList) return;
+    els.storiesScrollList.innerHTML = '';
+
+    if (!state.stories.length) {
+      if (els.storiesListMeta) {
+        els.storiesListMeta.textContent = 'No scripture stories found.';
+      }
+      return;
+    }
+
+    if (els.storiesListMeta) {
+      els.storiesListMeta.textContent = `${state.stories.length} stories — tap any story to open its starting verse`;
+    }
+
+    const frag = document.createDocumentFragment();
+    state.stories.forEach((s) => {
+      if (s.startIdx === undefined) return;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'verse-list-card story-list-card';
+      btn.innerHTML = `
+        <div class="verse-list-header">
+          <span class="verse-list-title">${s.title}</span>
+          <div class="verse-list-badges">
+            <span class="story-badge-pill">📖 ${s.startRef} – ${s.endRef}</span>
+            <span class="volume-pill">${s.volume}</span>
+          </div>
+        </div>
+        <p class="verse-list-text story-summary-text">${s.summary}</p>
+      `;
+      btn.addEventListener('click', () => {
+        setAnchorVerse(s.startIdx, null);
+        switchView('read');
+      });
+      frag.appendChild(btn);
+    });
+
+    els.storiesScrollList.appendChild(frag);
   }
 
   function setupSelectAndSearchUI() {
@@ -1239,7 +1442,30 @@
     });
 
     canvas.addEventListener('pointermove', (e) => {
-      if (!isPanning) return;
+      if (!isPanning) {
+        if (!state.loaded || !state.stories.length) return;
+        const rect = canvas.getBoundingClientRect();
+        const sx = e.clientX - rect.left;
+        const sy = e.clientY - rect.top;
+        let hoveredStory = null;
+        let bestDistSq = 14 * 14;
+        for (let i = 0; i < state.stories.length; i++) {
+          const s = state.stories[i];
+          if (s.startIdx === undefined) continue;
+          const [px, py] = dataToScreen(state.xs[s.startIdx], state.ys[s.startIdx]);
+          const dSq = (px - sx) * (px - sx) + (py - sy) * (py - sy);
+          if (dSq < bestDistSq) {
+            bestDistSq = dSq;
+            hoveredStory = s;
+          }
+        }
+        canvas.style.cursor = hoveredStory ? 'pointer' : '';
+        if (state.mapHoveredStory !== hoveredStory) {
+          state.mapHoveredStory = hoveredStory;
+          renderMap();
+        }
+        return;
+      }
       const nx = e.clientX - panStartX;
       const ny = e.clientY - panStartY;
       if (Math.hypot(nx - state.mapTransform.x, ny - state.mapTransform.y) > 4) {
@@ -1338,6 +1564,28 @@
 
     const xs = state.xs;
     const ys = state.ys;
+
+    // 1. Check Story Markers first — clicking a Story Marker navigates directly to its starting verse
+    let bestStory = null;
+    let bestStoryDistSq = 16 * 16; // 16px click/tap target radius for story diamonds
+    for (let i = 0; i < state.stories.length; i++) {
+      const s = state.stories[i];
+      if (s.startIdx === undefined) continue;
+      const [px, py] = dataToScreen(xs[s.startIdx], ys[s.startIdx]);
+      const dSq = (px - sx) * (px - sx) + (py - sy) * (py - sy);
+      if (dSq < bestStoryDistSq) {
+        bestStoryDistSq = dSq;
+        bestStory = s;
+      }
+    }
+
+    if (bestStory) {
+      setAnchorVerse(bestStory.startIdx, null);
+      switchView('read');
+      return;
+    }
+
+    // 2. Otherwise inspect the nearest scripture point
     const n = xs.length;
     let bestIdx = -1;
     let bestDistSq = 22 * 22; // 22px click radius
@@ -1417,6 +1665,31 @@
       ctx.stroke();
     });
 
+    // Draw clickable golden diamond Story Markers (◆) for every story in state.stories
+    for (let i = 0; i < state.stories.length; i++) {
+      const s = state.stories[i];
+      if (s.startIdx === undefined) continue;
+      const [px, py] = dataToScreen(xs[s.startIdx], ys[s.startIdx]);
+      if (px < -14 || px > width + 14 || py < -14 || py > height + 14) continue;
+
+      const isHovered = state.mapHoveredStory === s;
+      const isCurrentStory = currIdx >= s.startIdx && currIdx <= (s.endIdx ?? s.startIdx);
+      const r = isHovered || isCurrentStory ? 8.5 : 6.2;
+
+      ctx.beginPath();
+      ctx.moveTo(px, py - r);
+      ctx.lineTo(px + r, py);
+      ctx.lineTo(px, py + r);
+      ctx.lineTo(px - r, py);
+      ctx.closePath();
+
+      ctx.fillStyle = isHovered ? '#d97706' : '#f59e0b';
+      ctx.fill();
+      ctx.lineWidth = isHovered || isCurrentStory ? 2 : 1.4;
+      ctx.strokeStyle = '#ffffff';
+      ctx.stroke();
+    }
+
     // Draw reticle on inspected / current verse
     const inspectIdx = state.mapInspectedIndex ?? currIdx;
     const [ix, iy] = dataToScreen(xs[inspectIdx], ys[inspectIdx]);
@@ -1428,14 +1701,26 @@
 
     ctx.restore();
 
-    // Update map inspector bar
+    // Update map inspector bar (prioritizing hovered story if present)
+    const hoveredStory = state.mapHoveredStory;
+    if (hoveredStory) {
+      els.mapInspectorBadge.textContent = '📖 Story Marker (Click to Open)';
+      els.mapInspectorRef.textContent = hoveredStory.title;
+      els.mapInspectorCoords.textContent = `${hoveredStory.startRef} – ${hoveredStory.endRef}`;
+      els.mapInspectorText.textContent = hoveredStory.summary;
+      return;
+    }
+
     const iv = state.verses[inspectIdx];
     if (iv) {
-      els.mapInspectorBadge.textContent = inspectIdx === anchorIdx
-        ? 'Anchor'
-        : topSet.has(inspectIdx)
-          ? 'Top 50 Neighbor'
-          : 'Selected Point';
+      const matchingStory = state.stories.find((s) => s.startIdx === inspectIdx);
+      els.mapInspectorBadge.textContent = matchingStory
+        ? `📖 Story: ${matchingStory.shortTitle}`
+        : inspectIdx === anchorIdx
+          ? 'Anchor'
+          : topSet.has(inspectIdx)
+            ? 'Top 50 Neighbor'
+            : 'Selected Point';
       els.mapInspectorRef.textContent = iv.ref;
       els.mapInspectorCoords.textContent = `(${iv.x.toFixed(1)}, ${iv.y.toFixed(1)}) • Cluster ${iv.cluster}`;
       els.mapInspectorText.textContent = iv.text;
@@ -1586,6 +1871,16 @@
     els.cardChangeRefBtn.addEventListener('click', () => switchView('select'));
     els.cardViewSimilarBtn.addEventListener('click', () => switchView('similar'));
     els.cardViewMapBtn.addEventListener('click', () => switchView('map'));
+
+    // Story badge click on Swipe card: jump to the story's starting verse
+    if (els.cardStoryBadge) {
+      els.cardStoryBadge.addEventListener('click', () => {
+        const startIdx = parseInt(els.cardStoryBadge.dataset.storyStartIdx, 10);
+        if (!Number.isNaN(startIdx)) {
+          setAnchorVerse(startIdx, null);
+        }
+      });
+    }
 
     // Filter toggle in Similar view
     els.excludeSameBookToggle.addEventListener('change', renderSimilarView);

@@ -26,7 +26,10 @@
 
               <header class="card-header">
                 <div class="card-meta-top">
-                  <span class="volume-pill" id="card-volume">New Testament</span>
+                  <div class="card-meta-badges">
+                    <span class="volume-pill" id="card-volume">New Testament</span>
+                    <button type="button" class="story-progress-pill" id="card-story-badge" hidden></button>
+                  </div>
                   <span class="cluster-pill" id="card-cluster" title="t-SNE Cluster &amp; 2D Coordinates">Cluster 75</span>
                 </div>
 
@@ -118,28 +121,37 @@
         <div class="view-container">
           <div class="view-header">
             <h2>Select or Search Scripture</h2>
-            <p class="view-subtitle">Search any word or reference across all 41,995 verses, or browse by Book, Chapter, and Verse below.</p>
+            <p class="view-subtitle">Search stories and verses across all 41,995 scriptures, browse the stories list, or pick by Book, Chapter, and Verse.</p>
           </div>
 
           <!-- Always-Visible Live Search Bar -->
           <div class="tabpanel-inner search-section-card">
-            <label class="picker-label" for="search-input">Search Keyword, Phrase, or Reference</label>
+            <label class="picker-label" for="search-input">Search Stories, Keywords, or Verse References</label>
             <div class="search-bar-row">
               <input
                 type="search"
                 id="search-input"
                 class="search-input"
-                placeholder="Type words (e.g. 'mist of darkness', 'charity') or reference ('1 Nephi 12:4')…"
-                aria-label="Search scripture text or reference"
+                placeholder="Search story summaries (e.g. 'plates of brass', 'prodigal') or verses ('John 3:16')…"
+                aria-label="Search scripture stories, text, or reference"
                 autocomplete="off"
               >
               <button type="button" class="pill-btn" id="search-clear-btn" hidden>Clear</button>
               <button type="button" class="primary-btn" id="search-submit-btn">Search</button>
             </div>
             <div class="search-meta" id="search-meta">
-              Start typing to search all 41,995 verses instantly, or press Enter to jump to a matching reference.
+              Start typing to search story summaries and all 41,995 verses instantly.
             </div>
             <div class="search-results-list" id="search-results-list"></div>
+          </div>
+
+          <!-- Scrolling List of Scripture Stories Immediately Beneath Search Bar -->
+          <div class="tabpanel-inner stories-select-card">
+            <div class="browse-header-row">
+              <h3 class="browse-section-title">Scripture Stories</h3>
+              <span class="search-meta" id="stories-list-meta">Loading stories…</span>
+            </div>
+            <div class="stories-scroll-list" id="stories-scroll-list" role="region" aria-label="Scripture stories list"></div>
           </div>
 
           <!-- Featured Quick Jumps Scroller -->
@@ -239,7 +251,7 @@
             <div>
               <h2>2D t-SNE Scripture Map</h2>
               <p class="view-subtitle">
-                All 41,995 verses in 2D embedding space. Drag to pan, scroll/pinch to zoom, or tap any dot to inspect.
+                All 41,995 verses in 2D embedding space. Tap any golden story marker (<strong>◆</strong>) to jump to its starting verse, or tap any dot to inspect.
               </p>
             </div>
             <div class="map-controls-bar">
