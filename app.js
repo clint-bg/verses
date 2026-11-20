@@ -128,6 +128,7 @@
     searchSubmitBtn: document.getElementById('search-submit-btn'),
     searchMeta: document.getElementById('search-meta'),
     searchResultsList: document.getElementById('search-results-list'),
+    storiesSectionTitle: document.getElementById('stories-section-title'),
     storiesListMeta: document.getElementById('stories-list-meta'),
     storiesScrollList: document.getElementById('stories-scroll-list'),
 
@@ -903,6 +904,7 @@
     if (!q) {
       els.searchMeta.textContent = 'Start typing to search all 41,995 verses and story summaries instantly, or press Enter to jump to a match.';
       els.searchResultsList.innerHTML = '';
+      renderStoriesScrollList();
       return;
     }
 
@@ -973,40 +975,14 @@
       if (ok) matches.push(v);
     }
 
-    const storySummaryPart = storyMatches.length > 0
-      ? `${storyMatches.length} ${storyMatches.length === 1 ? 'story' : 'stories'} & `
-      : '';
-    const verseSummaryPart = matches.length >= maxResults
-      ? `top ${maxResults} verses`
-      : `${matches.length} ${matches.length === 1 ? 'verse' : 'verses'}`;
-    els.searchMeta.textContent = `Found ${storySummaryPart}${verseSummaryPart} matching "${q}" — click any result to open it`;
+    // Report Scripture Search Results first in #search-results-list
+    els.searchMeta.textContent = matches.length === 0
+      ? `No individual scripture verses matched "${q}".`
+      : `Matching Scriptures (${matches.length}${matches.length >= maxResults ? '+' : ''}) — click any scripture to open it`;
 
     els.searchResultsList.innerHTML = '';
     const frag = document.createDocumentFragment();
 
-    // Render matching Story results first (returning the Story Title as primary value)
-    storyMatches.forEach((s) => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'verse-list-card story-list-card';
-      btn.innerHTML = `
-        <div class="verse-list-header">
-          <span class="verse-list-title">${s.title}</span>
-          <div class="verse-list-badges">
-            <span class="story-badge-pill">📖 Story • ${s.startRef} – ${s.endRef}</span>
-            <span class="volume-pill">${s.volume}</span>
-          </div>
-        </div>
-        <p class="verse-list-text story-summary-text">${s.summary}</p>
-      `;
-      btn.addEventListener('click', () => {
-        setAnchorVerse(s.startIdx, null);
-        switchView('read');
-      });
-      frag.appendChild(btn);
-    });
-
-    // Render matching Verse results
     matches.forEach((v) => {
       const btn = document.createElement('button');
       btn.type = 'button';
@@ -1028,11 +1004,23 @@
       frag.appendChild(btn);
     });
     els.searchResultsList.appendChild(frag);
+
+    // Report Story Search Results below that in #stories-scroll-list
+    renderStoriesScrollList(storyMatches, q);
   }
 
-  function renderStoriesScrollList() {
+  function renderStoriesScrollList(filteredStories = null, searchQuery = '') {
     if (!els.storiesScrollList) return;
     els.storiesScrollList.innerHTML = '';
+
+    const isSearching = Boolean(searchQuery && filteredStories !== null);
+    const displayedStories = isSearching ? filteredStories : state.stories;
+
+    if (els.storiesSectionTitle) {
+      els.storiesSectionTitle.textContent = isSearching
+        ? `Matching Stories (${displayedStories.length})`
+        : 'Scripture Stories';
+    }
 
     if (!state.stories.length) {
       if (els.storiesListMeta) {
@@ -1042,11 +1030,17 @@
     }
 
     if (els.storiesListMeta) {
-      els.storiesListMeta.textContent = `${state.stories.length} stories — tap any story to open its starting verse`;
+      if (isSearching) {
+        els.storiesListMeta.textContent = displayedStories.length === 0
+          ? `No scripture stories matched "${searchQuery}"`
+          : `Filtered by "${searchQuery}" — click any story to open its starting verse`;
+      } else {
+        els.storiesListMeta.textContent = `${state.stories.length} stories — tap any story to open its starting verse`;
+      }
     }
 
     const frag = document.createDocumentFragment();
-    state.stories.forEach((s) => {
+    displayedStories.forEach((s) => {
       if (s.startIdx === undefined) return;
       const btn = document.createElement('button');
       btn.type = 'button';
